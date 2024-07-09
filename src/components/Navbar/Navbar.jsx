@@ -59,7 +59,7 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
-          <div className="cursor-pointer text-gray-900 hover:text-teal-600  py-2 rounded-md text-sm font-medium "  onClick={() =>userData?navigate('/orders'):toast.info("Please login to proceed")}>Order</div>
+          <div className="cursor-pointer text-gray-900 hover:text-teal-600  py-2 rounded-md text-sm font-medium "  onClick={() =>userData?navigate('/orders'):toast.info("Please login to proceed")}>Orders</div>
             <div onClick={() =>userData?navigate('/view-cart'):toast.info("Please login to proceed")} className="relative cursor-pointer flex items-center space-x-2 text-gray-900 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium">
               <img src={cartIcon} alt="Cart Icon" className="h-5 w-5" />
               <div className='font-medium'>Cart</div>

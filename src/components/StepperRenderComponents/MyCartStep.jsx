@@ -6,18 +6,43 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteCartItem, setCart, setOrderMode, updateCartItemQuantity } from "../../redux/carts/carts";
 import scrollToTop from "../../utilities/scrollToTop";
 
-const MyCartStep = () => {
+const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData }) => {
     // const [cartData, setCartData] = useState([]);
     const userId = useSelector((state) => state.user?.userData?.id);
     const dispatch = useDispatch()
     const cartData = useSelector(state => state.cart?.cartData ? state.cart?.cartData : []);
 
-    const handleRemoveCartItem = (id) => {
-        dispatch(deleteCartItem(id));
+    const handleRemoveCartItem = async (id) => {
+        // dispatch(deleteCartItem(id));
+        try {
+            const response = await apiDELETE(`/v1/cart/delete/${id}`);
+            if (response.status) {
+                const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
+                setStepperProgressCartData(stepperResponse.data?.data);
+            } else {
+                // return rejectWithValue(response.data);
+            }
+        } catch (error) {
+            // return rejectWithValue(error.response.data);
+        }
     };
 
-    const handleQuantityChange = (type, id, quantity) => {
-        dispatch(updateCartItemQuantity({ type, id, quantity }));
+    const handleQuantityChange = async (type, id, quantity) => {
+        // dispatch(updateCartItemQuantity({ type, id, quantity }));
+        const updatedQuantity = type === 'increment' ? quantity + 1 : quantity - 1;
+        const payload = { quantity: updatedQuantity };
+
+        try {
+            const response = await apiPUT(`/v1/cart/update/${id}`, payload);
+            if (response.status) {
+                const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
+                setStepperProgressCartData(stepperResponse.data?.data);
+            } else {
+                // return rejectWithValue(response.data);
+            }
+        } catch (error) {
+            // return rejectWithValue(error.response.data);
+        }
     };
 
     useEffect(() => {
@@ -42,11 +67,11 @@ const MyCartStep = () => {
 
     return (
         <>
-            {/* {JSON.stringify(cartData)} */}
-            <div className="text-2xl font-bold my-4">{cartData?.length} items added in Cart</div>
+            {/* {JSON.stringify(stepperProgressCartData.cartData)} */}
+            <div className="text-2xl font-bold my-4">{stepperProgressCartData?.cartData?.length} items added in Cart</div>
             <div className="lg:flex gap-5">
                 <div className="lg:w-1/2 min-w-[300px] max-h-[500px] overflow-y-auto scrollbar-custom scroll-smooth">
-                    {cartData.length !== 0 && cartData?.map((item) => (
+                    {stepperProgressCartData.cartData && stepperProgressCartData?.cartData?.length !== 0 && stepperProgressCartData?.cartData.map((item) => (
                         <ProductCardofCart
                             key={item._id}
                             item={item}
@@ -55,7 +80,7 @@ const MyCartStep = () => {
                         />
                     ))}
                 </div>
-                <PaymentDetails item={cartData ? cartData : []} />
+                <PaymentDetails item={stepperProgressCartData ? stepperProgressCartData : []} setStepperProgressCartData={setStepperProgressCartData} />
             </div>
         </>
     );

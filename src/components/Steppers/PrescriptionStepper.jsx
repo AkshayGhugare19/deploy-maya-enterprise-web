@@ -20,7 +20,7 @@ const PrescriptionStepper = ({ currentStep, steps }) => {
                         )}
                     </div>
                     <div className="ml-4">
-                        <p className={`text-[14px] ${currentStep >= step.id ? 'text-[#14967F]' : 'text-[#373435]'}`}>{`Step ${step.id}`}</p>
+                        <p className={`text-[14px] ${currentStep >= step.id ? 'text-[#14967F]' : 'text-[#373435]'}`}>{`Step ${step.id + 1}`}</p>
                         <p className={`text-[16px] ${currentStep >= step.id ? 'text-[#14967F]' : 'text-[#373435]'}`}>{step.name}</p>
                     </div>
                 </div>

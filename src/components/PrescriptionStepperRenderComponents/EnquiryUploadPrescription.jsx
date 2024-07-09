@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import ShowSelectedPrescription from "../presecription/ShowSelectedPrescription";
 import scrollToTop from "../../utilities/scrollToTop";
 
-const UploadPrescriptionStep = ({ type, setCurrentStep, stepperProgressCartData, setStepperProgressCartData }) => {
+const EnquiryUploadPrescription = ({ type, setCurrentStep, stepperProgressCartData, setStepperProgressCartData }) => {
     const dispatch = useDispatch()
     const [savedPrescription, setSavedPrescription] = useState([]);
     const [selectedImageIndexes, setSelectedImageIndexes] = useState([]);
@@ -41,27 +41,25 @@ const UploadPrescriptionStep = ({ type, setCurrentStep, stepperProgressCartData,
     };
 
     const selectedPrescription = async () => {
-        if (checkIsPriscriptionMandatory()) {
-            if (selectedImageUrl.length) {
-                const updateStepperProgressPayload = {
-                    selectedPrescription: selectedImageUrl,
-                    currentStep: 2
+        if (selectedImageUrl.length) {
+            const updateStepperProgressPayload = {
+                selectedPrescription: selectedImageUrl,
+                currentStep: 1
+            }
+            console.log("selectedImageUrl", selectedImageUrl);
+            // dispatch(updateSelectedPrescription(selectedImageUrl))
+            try {
+                const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
+                console.log("userStepperAddResponse", userStepperAddResponse);
+                if (userStepperAddResponse.status) {
+                    const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
+                    // setStepperProgressCartData(stepperResponse.data?.data);
                 }
-                console.log("selectedImageUrl", selectedImageUrl);
-                // dispatch(updateSelectedPrescription(selectedImageUrl))
-                try {
-                    const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
-                    console.log("userStepperAddResponse", userStepperAddResponse);
-                    if (userStepperAddResponse.status) {
-                        const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
-                        setStepperProgressCartData(stepperResponse.data?.data);
-                    }
-                } catch (error) {
-                    console.log("Error updating seleted prescription", error);
-                }
-                if (type == 'uploadPrescription') {
-                    setCurrentStep();
-                }
+            } catch (error) {
+                console.log("Error updating seleted prescription", error);
+            }
+            if (type == 'uploadPrescription') {
+                setCurrentStep();
             }
             else {
                 toast.error("Upload or Select Prescription to proceed")
@@ -94,7 +92,15 @@ const UploadPrescriptionStep = ({ type, setCurrentStep, stepperProgressCartData,
                 setUploadStatus('File uploaded successfully!');
                 console.log("prescriptionResponse", prescriptionResponse.data.data.data);
                 if (type === "uploadPrescription") {
-                    dispatch(updateSelectedPrescription(prescriptionResponse.data.data.data))
+                    const updateStepperProgressPayload = {
+                        selectedPrescription: prescriptionResponse.data.data.data
+                    }
+                    try {
+                        const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
+                    } catch (error) {
+                        console.log("Error updating stepper progress for user");
+                    }
+                    // dispatch(updateSelectedPrescription(prescriptionResponse.data.data.data))
                 }
                 getAllSavedPrescription()
             } else {
@@ -117,6 +123,7 @@ const UploadPrescriptionStep = ({ type, setCurrentStep, stepperProgressCartData,
     }, [uploadedFileUrl]); // Trigger fetch on initial render and whenever uploadStatus changes
     return (
         <div className="bg-white p-8 rounded-lg shadow-lg mt-4 w-full">
+            {/* {JSON.stringify(selectedImageUrl)} */}
             <label className="block mb-2 text-lg font-bold text-gray-700">
                 Upload Prescription
             </label>
@@ -153,4 +160,4 @@ const UploadPrescriptionStep = ({ type, setCurrentStep, stepperProgressCartData,
         </div>
     );
 }
-export default UploadPrescriptionStep;
+export default EnquiryUploadPrescription;

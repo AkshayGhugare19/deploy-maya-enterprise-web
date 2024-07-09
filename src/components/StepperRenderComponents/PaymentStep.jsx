@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import scrollToTop from "../../utilities/scrollToTop";
 
-const PaymentStep = () => {
+const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) => {
     const cartData = useSelector(state => state.cart?.cartData ? state.cart?.cartData : []);
     const fullUserCartDetails = useSelector(state => state.cart ? state.cart : []);
     const userId = useSelector((state) => state.user?.userData?.id);
@@ -25,11 +25,11 @@ const PaymentStep = () => {
             try {
                 const addOrderPayload = {
                     userId,
-                    addressId: fullUserCartDetails?.selectedAddress?._id,
-                    prescriptionId: fullUserCartDetails?.selectedPrescription[0]?._id,
+                    addressId: stepperProgressCartData?.selectedAddress?._id,
+                    prescriptionId: stepperProgressCartData?.selectedPrescription[0]?._id,
                     orderType: selectedOption,
                     mode: 'order',
-                    totalPayment: fullUserCartDetails?.totalCartAmount
+                    totalPayment: stepperProgressCartData?.totalCartAmount
                 }
                 let addOrderResponse;
                 try {
@@ -39,13 +39,13 @@ const PaymentStep = () => {
                 }
                 if (addOrderResponse && addOrderResponse.status) {
                     toast.success('Order added successfully')
-                    if (addOrderResponse?.data?.data && cartData.length) {
-                        cartData?.map(async (item) => {
+                    if (addOrderResponse?.data?.data && stepperProgressCartData?.cartData?.length) {
+                        stepperProgressCartData?.cartData && stepperProgressCartData?.cartData?.length !== 0 && stepperProgressCartData?.cartData?.map(async (item) => {
                             console.log(addOrderResponse?.data);
                             const addOrderItemPayload = {
                                 orderId: addOrderResponse?.data?.data?.id,
                                 productId: item?.productId,
-                                quantity: item.quantity,
+                                quantity: item?.quantity,
                             }
                             try {
                                 const orderItemResponse = await apiPOST(`/v1/order-item/add`, addOrderItemPayload);
@@ -59,7 +59,7 @@ const PaymentStep = () => {
                             if (checkoutResponse.status) {
                                 const checkoutUrl = checkoutResponse?.data?.data?.url;
                                 console.log(checkoutUrl);
-                                dispatch(resetUserCartData())
+                                // dispatch(resetUserCartData())
                                 window.location.replace(checkoutUrl)
                             } else {
                                 console.error("Failed to create checkout session:", checkoutResponse.data);
@@ -138,8 +138,8 @@ const PaymentStep = () => {
                 <button className="bg-[#14967F] font-[600] text-[#FFFFFF] w-[200px] rounded-[30px] p-2 self-end" onClick={addOrderAndItems}>Proceed to Payment</button>
             </div>
             <div className="flex flex-col lg:w-1/2">
-                <PaymentSummary type="summary" item={cartData ? cartData : []} />
-                <AttachedPrescription type="cart" />
+                <PaymentSummary type="summary" item={stepperProgressCartData?.cartData ? stepperProgressCartData?.cartData : []} />
+                <AttachedPrescription type="cart" stepperProgressCartData={stepperProgressCartData} />
             </div>
         </div>
     </div>

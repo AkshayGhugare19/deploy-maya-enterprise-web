@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setOrderMode, updateStep } from "../../redux/carts/carts";
-const PaymentDetails = ({ item }) => {
+import { apiGET, apiPUT } from "../../utilities/apiHelpers";
+import { API_URL } from "../../config";
+const PaymentDetails = ({ item, setStepperProgressCartData }) => {
     const dispatch = useDispatch();
+    const userId = useSelector((state) => state.user?.userData?.id);
     const currentStep = useSelector((state) => state.cart.currentStep ? state.cart.currentStep : 0)
     const selectedAddress = useSelector((state) => state.cart.selectedAddress ? state.cart.selectedAddress : '')
     const globalConfig = useSelector((state) => state.globalConfig?.globalConfigData ? state.globalConfig?.globalConfigData : '')
@@ -14,16 +17,32 @@ const PaymentDetails = ({ item }) => {
         return totalPrice;
     }
 
-    const goToNextStep = () => {
+    const goToNextStep = async () => {
         console.log(currentStep);
-        dispatch(updateStep(currentStep + 1));
+
+        if (item?.currentStep == 0) {
+            const updatePayload = {
+                currentStep: 1
+            }
+            try {
+                const response = await apiPUT(`/v1/stepper-progress/update-stepper-progress/${userId}`, updatePayload);
+                if (response.status) {
+                    const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
+                    setStepperProgressCartData(stepperResponse.data?.data);
+                }
+            } catch (error) {
+                console.log("Error Updating Stepper Response", error);
+            }
+
+        }
+        // dispatch(updateStep(currentStep + 1));
         dispatch(setOrderMode('order'))
     };
 
-    return <div className={`lg:w-1/2 h-full bg-white shadow-md rounded-lg p-6 ${item?.length === 0 ? 'hidden' : ''}`}>
+    return <div className={`lg:w-1/2 h-full bg-white shadow-md rounded-lg p-6 ${item?.cartData?.length === 0 ? 'hidden' : ''}`}>
         <h3 className="text-lg font-semibold text-gray-800">Payment Details</h3>
         <p className="flex justify-between text-gray-600 mt-4">
-            <span>Cart Amount</span> <span>₹{calculateCartAmount(item)}</span>
+            <span>Cart Amount</span> <span>₹{item?.cartAmount}</span>
         </p>
         <p className="flex justify-between text-gray-600 mt-2">
             <span>Packaging Charges</span> <span>+ ₹{globalConfig?.packagingCharges}</span>
@@ -32,7 +51,7 @@ const PaymentDetails = ({ item }) => {
             <span>Delivery Charges</span> <span>+ ₹{globalConfig?.deliveryCharges}</span>
         </p>
         <p className="flex justify-between text-[#14967F] mt-4 font-bold text-lg">
-            <span>Total to pay</span> <span>₹{calculateCartAmount(item) + globalConfig?.deliveryCharges + globalConfig?.packagingCharges}</span>
+            <span>Total to pay</span> <span>₹{item?.totalCartAmount}</span>
         </p>
         {/* <div className="mt-4 p-4 bg-gray-100 rounded-lg">
             <p className="text-gray-600">Delivering to</p>

@@ -9,11 +9,15 @@ import { fetchGlobalConfig } from "../redux/globalconfig/globalconfig";
 import { useDispatch, useSelector } from "react-redux";
 import { resetStateForEnquiry, updateStep } from "../redux/carts/carts";
 import { FaArrowLeftLong } from "react-icons/fa6";
+import { apiGET, apiPOST } from "../utilities/apiHelpers";
+import { API_URL } from "../config";
 
 const ViewCart = () => {
     const dispatch = useDispatch();
     const currentStep = useSelector((state) => state.cart?.currentStep);
     const orderMode = useSelector((state) => state.cart?.orderMode) || '';
+    const userId = useSelector((state) => state.user?.userData.id) || '';
+    const [stepperProgressCartData, setStepperProgressCartData] = useState([]);
     // const [currentStep, setCurrentStep] = useState(0);
     const steps = [
         'My Cart',
@@ -30,7 +34,7 @@ const ViewCart = () => {
     };
 
     const goToPrevStep = () => {
-        if (currentStep > 0) {
+        if (stepperProgressCartData?.currentStep > 0) {
             dispatch(updateStep(currentStep - 1))
         }
     };
@@ -38,38 +42,61 @@ const ViewCart = () => {
     const renderStepComponent = (stepIndex) => {
         switch (stepIndex) {
             case 0:
-                return <MyCartStep />;
+                return <MyCartStep stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />;
             case 1:
-                return <UploadPrescriptionStep type="cart" />;
+                return <UploadPrescriptionStep type="cart" stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />;
             case 2:
-                return <AddressStep />;
+                return <AddressStep stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />;
             case 3:
-                return <OrderSummaryStep />;
+                return <OrderSummaryStep stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />;
             case 4:
-                return <PaymentStep />;
+                return <PaymentStep stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />;
             default:
                 return null;
         }
     };
 
+    const getUserStepperProgress = async () => {
+        try {
+            const userStepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`);
+            if (userStepperResponse?.data?.code == 400 && !userStepperResponse?.data?.status) {
+                const stepperProgressAddPayload = {
+                    orderMode: 'order'
+                }
+                const userStepperAddResponse = await apiPOST(`${API_URL}/v1/stepper-progress/add-stepper-progress/${userId}`, stepperProgressAddPayload);
+                console.log("userStepperAddResponse", userStepperAddResponse);
+                setStepperProgressCartData(userStepperAddResponse.data?.data);
+            } else {
+                setStepperProgressCartData(userStepperResponse.data?.data);
+            }
+            console.log("response", userStepperResponse);
+        } catch (error) {
+            console.error("Error fetching or creating stepper progress:", error);
+        }
+    }
+
     useEffect(() => {
         dispatch(fetchGlobalConfig())
-        console.log(currentStep);
+        const fetchProgress = async () => {
+            await getUserStepperProgress();
+        };
+        fetchProgress();
+        console.log(stepperProgressCartData?.currentStep);
         // return () => {
         //     dispatch(resetStateForEnquiry());
         // };
     }, [])
 
     return <div className="container mx-auto p-4">
-        <MyCartStepper steps={steps} currentStep={currentStep} />
+        <MyCartStepper steps={steps} currentStep={stepperProgressCartData?.currentStep} />
         {
-            currentStep > 0 && orderMode != 'enquiry' && <button
+            stepperProgressCartData?.currentStep > 0 && orderMode != 'enquiry' && <button
                 onClick={goToPrevStep}
                 className="flex items-center justify-start gap-2 mt-2">
-                <FaArrowLeftLong />Back to {steps[currentStep - 1]}
+                <FaArrowLeftLong />Back to {steps[stepperProgressCartData?.currentStep - 1]}
             </button>
         }
-        {renderStepComponent(currentStep)}
+        {renderStepComponent(stepperProgressCartData?.currentStep)}
     </div>
 }
 

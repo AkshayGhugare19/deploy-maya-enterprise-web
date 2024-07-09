@@ -6,29 +6,70 @@ import { deleteCartItem, updateCartItemQuantity, updateOrderSummary } from "../.
 import AttachedPrescription from "../presecription/AttachedPrescription";
 import PaymentSummary from "../PaymentDetails/PaymentSummary";
 import scrollToTop from "../../utilities/scrollToTop";
+import { apiDELETE, apiGET, apiPUT } from "../../utilities/apiHelpers";
+import { API_URL } from "../../config";
 
-const OrderSummaryStep = () => {
+const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData }) => {
     const cartData = useSelector(state => state.cart?.cartData ? state.cart?.cartData : []);
     const userId = useSelector((state) => state.user?.userData?.id);
     const dispatch = useDispatch()
-    const handleRemoveCartItem = (id) => {
-        dispatch(deleteCartItem(id));
+    const handleRemoveCartItem = async (id) => {
+        // dispatch(deleteCartItem(id));
+        try {
+            const response = await apiDELETE(`/v1/cart/delete/${id}`);
+            if (response.status) {
+                const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
+                setStepperProgressCartData(stepperResponse.data?.data);
+            } else {
+                // return rejectWithValue(response.data);
+            }
+        } catch (error) {
+            // return rejectWithValue(error.response.data);
+        }
     };
 
-    const handleQuantityChange = (type, id, quantity) => {
-        dispatch(updateCartItemQuantity({ type, id, quantity }));
+    const handleQuantityChange = async (type, id, quantity) => {
+        // dispatch(updateCartItemQuantity({ type, id, quantity }));
+        const updatedQuantity = type === 'increment' ? quantity + 1 : quantity - 1;
+        const payload = { quantity: updatedQuantity };
+
+        try {
+            const response = await apiPUT(`/v1/cart/update/${id}`, payload);
+            if (response.status) {
+                const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
+                setStepperProgressCartData(stepperResponse.data?.data);
+            } else {
+                // return rejectWithValue(response.data);
+            }
+        } catch (error) {
+            // return rejectWithValue(error.response.data);
+        }
     };
-    const setOrderSummary = () => {
-        dispatch(updateOrderSummary())
+
+    const setOrderSummary = async () => {
+        // dispatch(updateOrderSummary())
+        const updateStepperProgressPayload = {
+            currentStep: 4
+        }
+        try {
+            const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
+            console.log("userStepperAddResponse", userStepperAddResponse);
+            if (userStepperAddResponse.status) {
+                const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
+                setStepperProgressCartData(stepperResponse.data?.data);
+            }
+        } catch (error) {
+            console.log("Error updating seleted prescription", error);
+        }
     }
     useEffect(() => {
         scrollToTop()
     }, [])
     return <div>
-        <div className="text-2xl font-bold my-4">Order List {cartData?.length} items</div>
+        <div className="text-2xl font-bold my-4">Order List {stepperProgressCartData?.cartData?.length} items</div>
         <div className="lg:flex gap-5">
             <div className="lg:w-1/2 flex flex-col">
-                {cartData.length !== 0 && cartData?.map((item) => (
+                {stepperProgressCartData.cartData && stepperProgressCartData?.cartData?.length !== 0 && stepperProgressCartData?.cartData.map((item) => (
                     <ProductCardofCart
                         key={item._id}
                         item={item}
@@ -39,8 +80,8 @@ const OrderSummaryStep = () => {
                 <button className="bg-[#14967F] font-[600] text-[#FFFFFF] w-[200px] rounded-[30px] p-2 self-end	" onClick={setOrderSummary}>Proceed to Payment</button>
             </div>
             <div className="flex flex-col lg:w-1/2">
-                <PaymentSummary type="summary" item={cartData ? cartData : []} />
-                <AttachedPrescription type="cart" />
+                <PaymentSummary type="summary" item={stepperProgressCartData?.cartData ? stepperProgressCartData?.cartData : []} />
+                <AttachedPrescription type="cart" stepperProgressCartData={stepperProgressCartData} />
             </div>
         </div>
     </div>

@@ -1,29 +1,77 @@
 // App.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PrescriptionStepper from '../components/Steppers/PrescriptionStepper';
 import UploadPrescriptionStep from '../components/StepperRenderComponents/UploadPrescriptionStep';
 import ChooseMedicines from '../components/PrescriptionStepperRenderComponents/ChooseMedicines';
 import AddressDetails from '../components/PrescriptionStepperRenderComponents/AddressDetails';
+import { apiGET, apiPOST, apiPUT } from '../utilities/apiHelpers';
+import { API_URL } from '../config';
+import { useSelector } from 'react-redux';
+import EnquiryUploadPrescription from '../components/PrescriptionStepperRenderComponents/EnquiryUploadPrescription';
 
 const UploadPrescription = () => {
     const [currentStep, setCurrentStep] = useState(1);
+    const [stepperProgressCartData, setStepperProgressCartData] = useState([]);
     const steps = [
-        { id: 1, name: 'Upload Prescription' },
-        { id: 2, name: 'Choose Your Medicines' },
-        { id: 3, name: 'Address Details' },
+        { id: 0, name: 'Upload Prescription' },
+        { id: 1, name: 'Choose Your Medicines' },
+        { id: 2, name: 'Address Details' },
     ];
+    const userId = useSelector((state) => state.user?.userData?.id) || ""
 
-    const handleCurrentStepUpdate = (id) => {
+    const handleCurrentStepUpdate = async (id) => {
+        const updateStepperProgressPayload = {
+            currentStep: id
+        }
+        try {
+            const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
+            console.log("userStepperAddResponse", userStepperAddResponse);
+            if (userStepperAddResponse.status) {
+                const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
+                setStepperProgressCartData(stepperResponse.data?.data);
+            }
+        } catch (error) {
+            console.log("Error updating seleted prescription", error);
+        }
         setCurrentStep(id)
     }
 
+    const getUserStepperProgress = async () => {
+        try {
+            const userStepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`);
+            if (userStepperResponse?.data?.code == 400 && !userStepperResponse?.data?.status) {
+                const stepperProgressAddPayload = {
+                    orderMode: 'enquiry',
+                    currentStep: 0
+                }
+                const userStepperAddResponse = await apiPOST(`${API_URL}/v1/stepper-progress/add-stepper-progress/${userId}`, stepperProgressAddPayload);
+                console.log("userStepperAddResponse", userStepperAddResponse);
+                setStepperProgressCartData(userStepperAddResponse.data?.data);
+            } else {
+                const stepperProgressUpdatePayload = {
+                    orderMode: 'enquiry'
+                }
+                const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, stepperProgressUpdatePayload);
+                console.log('userStepperAddResponse', userStepperAddResponse);
+                setStepperProgressCartData(userStepperResponse.data?.data);
+            }
+            console.log("response", userStepperResponse);
+        } catch (error) {
+            console.error("Error fetching or creating stepper progress:", error);
+        }
+    }
+
+    useEffect(() => {
+        getUserStepperProgress()
+    }, [])
+
     const renderStepComponent = (stepIndex) => {
         switch (stepIndex) {
+            case 0:
+                return <EnquiryUploadPrescription type="uploadPrescription" setCurrentStep={() => handleCurrentStepUpdate(1)} />;
             case 1:
-                return <UploadPrescriptionStep type="uploadPrescription" setCurrentStep={() => handleCurrentStepUpdate(2)} />;
+                return <ChooseMedicines setCurrentStep={() => handleCurrentStepUpdate(2)} />;
             case 2:
-                return <ChooseMedicines setCurrentStep={() => handleCurrentStepUpdate(3)} />;
-            case 3:
                 return <AddressDetails />;
             default:
                 return null;
@@ -34,10 +82,10 @@ const UploadPrescription = () => {
             <h1 className='text-[#101010] font-bold text-lg'>Upload Prescription</h1>
             <div className='lg:flex  gap-4'>
                 <div className='lg:w-1/4 mt-4'>
-                    <PrescriptionStepper currentStep={currentStep} steps={steps} />
+                    <PrescriptionStepper currentStep={stepperProgressCartData?.currentStep} steps={steps} />
                 </div>
                 <div className='w-full'>
-                    {renderStepComponent(currentStep)}
+                    {renderStepComponent(stepperProgressCartData?.currentStep)}
                 </div>
             </div>
         </div>

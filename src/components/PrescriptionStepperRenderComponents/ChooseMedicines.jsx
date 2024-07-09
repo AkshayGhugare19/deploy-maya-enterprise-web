@@ -1,22 +1,50 @@
 import React, { useState } from "react";
 import AttachedPrescription from "../presecription/AttachedPrescription";
 import { updateSelectedPrescriptionDuration, updateSelectedPrescriptionDurationUnit, updateSelectedPrescriptionType } from "../../redux/carts/carts";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { apiGET, apiPUT } from "../../utilities/apiHelpers";
+import { API_URL } from "../../config";
 
 const ChooseMedicines = ({ setCurrentStep }) => {
     const [duration, setDuration] = useState(5);
     const [unit, setUnit] = useState('Days');
     const [selectedOption, setSelectedOption] = useState('asPerPrescription');
     const dispatch = useDispatch();
-
-    const handleDurationChange = (e) => {
+    const userId = useSelector((state) => state.user?.userData?.id) || ""
+    const handleDurationChange = async (e) => {
         setDuration(e.target.value);
-        dispatch(updateSelectedPrescriptionDuration(e.target.value))
+        // dispatch(updateSelectedPrescriptionDuration(e.target.value))
+        const updateStepperProgressPayload = {
+            prescriptionDuration: e.target.value
+        }
+        try {
+            const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
+            console.log("userStepperAddResponse", userStepperAddResponse);
+            if (userStepperAddResponse.status) {
+                const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
+                // setStepperProgressCartData(stepperResponse.data?.data);
+            }
+        } catch (error) {
+            console.log("Error updating seleted prescription", error);
+        }
     };
 
-    const handleUnitChange = (e) => {
+    const handleUnitChange = async (e) => {
         setUnit(e.target.value);
-        dispatch(updateSelectedPrescriptionDurationUnit(unit))
+        // dispatch(updateSelectedPrescriptionDurationUnit(unit))
+        const updateStepperProgressPayload = {
+            prescriptionDurationUnit: unit
+        }
+        try {
+            const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
+            console.log("userStepperAddResponse", userStepperAddResponse);
+            if (userStepperAddResponse.status) {
+                const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
+                // setStepperProgressCartData(stepperResponse.data?.data);
+            }
+        } catch (error) {
+            console.log("Error updating seleted prescription", error);
+        }
     };
 
     const handleOptionChange = (option) => {
