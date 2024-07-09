@@ -5,7 +5,7 @@ import { apiPOST } from "../../utilities/apiHelpers";
 import { useSelector } from "react-redux";
 
 const VerifyOTP = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const location = useLocation();
   const formData = location.state;
 
@@ -14,16 +14,30 @@ const VerifyOTP = () => {
   const [otp, setOtp] = useState(new Array(4).fill(""));
   const [phoneNumber, setPhoneNumber] = useState("");
   const [errors, setErrors] = useState("");
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (element, index) => {
+    const value = element.value;
+
     if (isNaN(element.value)) return false;
 
     setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]);
 
     // Focus on the next input
-    if (element.nextSibling) {
+    if (value !== "" && element.nextSibling) {
       element.nextSibling.focus();
+    } else if (value === "" && element.previousSibling) {
+      element.previousSibling.focus();
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && e.target.value === "" && e.target.previousSibling) {
+      e.target.previousSibling.focus();
+    } else if (e.key === "ArrowRight" && e.target.nextSibling) {
+      e.target.nextSibling.focus();
+    } else if (e.key === "ArrowLeft" && e.target.previousSibling) {
+      e.target.previousSibling.focus();
     }
   };
 
@@ -57,10 +71,10 @@ const VerifyOTP = () => {
       setErrors("");
       try {
         let payload = {
-          otp:  otp.join(""),
+          otp: otp.join(""),
           email: formData.email,
         };
-        setloading(true);
+        setLoading(true);
         const response = await apiPOST("v1/auth/verify-otp", payload);
         console.log("response", response);
         if (response.status === 200) {
@@ -69,7 +83,7 @@ const VerifyOTP = () => {
             text: "OTP verified Successfully",
             icon: "success",
           }).then(() => {
-              navigate('/login');
+            navigate("/login");
           });
         } else {
           Toast.fire({
@@ -89,7 +103,7 @@ const VerifyOTP = () => {
           icon: "error",
         });
       } finally {
-        setloading(false);
+        setLoading(false);
       }
     }
   };
@@ -98,15 +112,17 @@ const VerifyOTP = () => {
     <div className="flex max-w-4xl md:mx-auto mt-10 border rounded-lg overflow-hidden shadow-lg mx-5">
       <div
         style={{ backgroundColor: "#F1F9FF" }}
-        className=" hidden md:block lg:block   flex-1 p-10 flex flex-col rounded-xl items-end"
+        className="hidden md:block lg:block flex-1 p-10 rounded-xl items-end"
       >
-        <h2 className="text-2xl font-bold mb-4">Medicines, Home Delivered</h2>
-        <p className="text-xs text-gray-400">
-          Order any medicine or health product and we'll deliver it for free.
-          Enjoy discounts on everything.
-        </p>
+        <div className="mt-[100%]">
+          <h2 className="text-2xl font-bold mb-4">Medicines, Home Delivered</h2>
+          <p className="text-xs text-gray-400">
+            Order any medicine or health product and we'll deliver it for free.
+            Enjoy discounts on everything.
+          </p>
+        </div>
       </div>
-      <div className="flex-1 p-10 bg-white ">
+      <div className="flex-1 p-10 bg-white">
         <div className="flex justify-between">
           <h2 className="text-2xl font-bold mb-4">Verify OTP</h2>
           <button className="text-gray-600 text-2xl font-bold">&times;</button>
@@ -125,20 +141,19 @@ const VerifyOTP = () => {
               <p className="text-gray-600 text-sm">Enter OTP </p>
             </div>
             <div className="flex justify-between mb-4">
-              {otp.map((data, index) => {
-                return (
-                  <input
-                    className=" w-12 h-12 sm:w-16 sm:h-16 lg:w-16 lg:h-16 md:w-16 md:h-16  text-center rounded-lg border bg-[#F8F8F8]"
-                    type="text"
-                    name="otp"
-                    maxLength="1"
-                    key={index}
-                    value={data}
-                    onChange={(e) => handleChange(e.target, index)}
-                    onFocus={(e) => e.target.select()}
-                  />
-                );
-              })}
+              {otp.map((data, index) => (
+                <input
+                  className="w-12 h-12 sm:w-16 sm:h-16 lg:w-16 lg:h-16 md:w-16 md:h-16 text-center rounded-lg border bg-[#F8F8F8]"
+                  type="text"
+                  name="otp"
+                  maxLength="1"
+                  key={index}
+                  value={data}
+                  onChange={(e) => handleChange(e.target, index)}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
+                />
+              ))}
             </div>
             {errors && (
               <div className="text-red-500 text-sm mb-4">{errors}</div>
@@ -155,8 +170,9 @@ const VerifyOTP = () => {
           <button
             type="submit"
             className="w-full py-2 text-white font-semibold bg-[#095D7E] rounded-full"
+            disabled={loading}
           >
-            Verify OTP
+            {loading ? "Verifying..." : "Verify OTP"}
           </button>
         </form>
         <p className="mt-4 text-xs text-gray-600">

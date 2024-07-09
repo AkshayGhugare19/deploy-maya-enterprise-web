@@ -7,6 +7,7 @@ import { apiPOST, apiPUT } from "../../utilities/apiHelpers";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import scrollToTop from "../../utilities/scrollToTop";
+import ButtonWithLoader from "../Button/ButtonWithLoader";
 
 const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) => {
     const cartData = useSelector(state => state.cart?.cartData ? state.cart?.cartData : []);
@@ -15,6 +16,7 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
     const orderMode = useSelector((state) => state.cart?.orderMode) || '';
     const enquiryId = useSelector((state) => state.cart?.enquiryId) || '';
     const [selectedOption, setSelectedOption] = useState('online');
+    const [loading,setLoading] = useState(false);
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const handleOptionChange = (event) => {
@@ -22,6 +24,7 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
     };
     const addOrderAndItems = async () => {
         if (orderMode === 'order') {
+            setLoading(true);
             try {
                 const addOrderPayload = {
                     userId,
@@ -39,6 +42,7 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                 }
                 if (addOrderResponse && addOrderResponse.status) {
                     toast.success('Order added successfully')
+                    setLoading(false);
                     if (addOrderResponse?.data?.data && stepperProgressCartData?.cartData?.length) {
                         stepperProgressCartData?.cartData && stepperProgressCartData?.cartData?.length !== 0 && stepperProgressCartData?.cartData?.map(async (item) => {
                             console.log(addOrderResponse?.data);
@@ -55,25 +59,31 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                         })
                         console.log("addOrderResponse::", addOrderResponse?.data?.data);
                         if (addOrderResponse?.data?.data?.id) {
+                            setLoading(true)
                             const checkoutResponse = await apiPOST(`/v1/payment/create-checkout/${addOrderResponse?.data?.data?.id}`);
                             if (checkoutResponse.status) {
+                                setLoading(false)
                                 const checkoutUrl = checkoutResponse?.data?.data?.url;
                                 console.log(checkoutUrl);
                                 // dispatch(resetUserCartData())
                                 window.location.replace(checkoutUrl)
                             } else {
                                 console.error("Failed to create checkout session:", checkoutResponse.data);
+                                setLoading(false)
                             }
                         }
                     }
                 } else {
                     console.log("Error adding order")
+                    setLoading(false)
                 }
             } catch (error) {
                 toast.error('Error', error)
+                setLoading(false)
             }
         } else if (orderMode === 'enquiry') {
             console.log("enquiry");
+            setLoading(true);
             try {
                 const payload = {
                     mode: 'order',
@@ -83,17 +93,21 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                 if (checkoutResponse.status) {
                     const checkoutUrl = checkoutResponse?.data?.data?.url;
                     console.log(checkoutUrl);
+                    setLoading(false);
                     dispatch(resetUserCartData())
                     window.location.replace(checkoutUrl)
                 } else {
                     console.error("Failed to create checkout session:", checkoutResponse.data);
+                    setLoading(false);
                 }
 
             } catch (error) {
                 console.log("Error Placing order::", error);
+                setLoading(false);
             }
         } else {
             toast.error("Failed to make payment")
+            setLoading(false);
         }
     };
 
@@ -135,7 +149,8 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                         </label>
                     </div>
                 </div>
-                <button className="bg-[#14967F] font-[600] text-[#FFFFFF] w-[200px] rounded-[30px] p-2 self-end" onClick={addOrderAndItems}>Proceed to Payment</button>
+                <ButtonWithLoader loading={loading} buttonText={"Proceed to payment"} onClick={addOrderAndItems} width={"w-[200px]"}/>
+                {/* <button className="bg-[#14967F] font-[600] text-[#FFFFFF] w-[200px] rounded-[30px] p-2 self-end" onClick={addOrderAndItems}>Proceed to Payment</button> */}
             </div>
             <div className="flex flex-col lg:w-1/2">
                 <PaymentSummary type="summary" item={stepperProgressCartData?.cartData ? stepperProgressCartData?.cartData : []} />

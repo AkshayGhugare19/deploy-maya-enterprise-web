@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ProductCardofCart from "../productComponents/ProductCardofCart";
 import PaymentDetails from "../PaymentDetails/PaymentDetails";
@@ -8,11 +8,13 @@ import PaymentSummary from "../PaymentDetails/PaymentSummary";
 import scrollToTop from "../../utilities/scrollToTop";
 import { apiDELETE, apiGET, apiPUT } from "../../utilities/apiHelpers";
 import { API_URL } from "../../config";
+import ButtonWithLoader from "../Button/ButtonWithLoader";
 
 const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData }) => {
     const cartData = useSelector(state => state.cart?.cartData ? state.cart?.cartData : []);
     const userId = useSelector((state) => state.user?.userData?.id);
     const dispatch = useDispatch()
+    const [loading,setLoading] = useState(false)
     const handleRemoveCartItem = async (id) => {
         // dispatch(deleteCartItem(id));
         try {
@@ -48,6 +50,7 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
 
     const setOrderSummary = async () => {
         // dispatch(updateOrderSummary())
+        setLoading(true)
         const updateStepperProgressPayload = {
             currentStep: 4
         }
@@ -57,9 +60,11 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
             if (userStepperAddResponse.status) {
                 const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
                 setStepperProgressCartData(stepperResponse.data?.data);
+                setLoading(false)
             }
         } catch (error) {
             console.log("Error updating seleted prescription", error);
+            setLoading(false)
         }
     }
     useEffect(() => {
@@ -77,7 +82,9 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
                         onQuantityChange={(type) => handleQuantityChange(type, item._id, item.quantity)}
                     />
                 ))}
-                <button className="bg-[#14967F] font-[600] text-[#FFFFFF] w-[200px] rounded-[30px] p-2 self-end	" onClick={setOrderSummary}>Proceed to Payment</button>
+                <ButtonWithLoader loading={loading} buttonText={"Proceed to payment"} onClick={setOrderSummary} width={"w-[200px]"}/>
+
+                {/* <button className="bg-[#14967F] font-[600] text-[#FFFFFF] w-[200px] rounded-[30px] p-2 self-end	" onClick={setOrderSummary}>Proceed to Payment</button> */}
             </div>
             <div className="flex flex-col lg:w-1/2">
                 <PaymentSummary type="summary" item={stepperProgressCartData?.cartData ? stepperProgressCartData?.cartData : []} />

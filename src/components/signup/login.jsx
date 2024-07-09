@@ -123,7 +123,7 @@ function Login() {
   return (
     <div className="flex max-w-4xl md:mx-auto mt-10 border rounded-lg overflow-hidden shadow-lg mx-5">
       <div style={{ backgroundColor: '#F1F9FF' }} className="hidden sm:hidden flex-1 p-10 flex flex-col flex-wrap md:block lg:block rounded-xl m-2 justify-end">
-        <div className='mt-[70%]'>
+        <div className='mt-[100%]'>
           <h2 className="text-2xl font-bold mb-4">Medicines, Home Delivered</h2>
           <p className="text-xs text-gray-400">
             Order any medicine or health product and we'll deliver it for free.

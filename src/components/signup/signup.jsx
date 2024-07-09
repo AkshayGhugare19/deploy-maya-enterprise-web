@@ -159,7 +159,7 @@ const Signup = () => {
         style={{ backgroundColor: "#F1F9FF" }}
         className=" hidden lg:block md:block flex-1 p-10 rounded-xl m-2 items-end"
       >
-        <div className='mt-[70%]'>
+        <div className='mt-[100%]'>
           <h2 className="text-2xl font-bold mb-4">Medicines, Home Delivered</h2>
           <p className="text-xs text-gray-400">
             Order any medicine or health product and we'll deliver it for free.
