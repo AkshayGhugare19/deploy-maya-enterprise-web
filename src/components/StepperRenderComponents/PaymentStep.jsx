@@ -23,8 +23,8 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
         setSelectedOption(event.target.value);
     };
     const addOrderAndItems = async () => {
-        if (orderMode === 'order') {
-            setLoading(true);
+        if (stepperProgressCartData?.orderMode === 'order') {
+        setLoading(true);
             try {
                 const addOrderPayload = {
                     userId,
@@ -81,7 +81,7 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                 toast.error('Error', error)
                 setLoading(false)
             }
-        } else if (orderMode === 'enquiry') {
+        } else if (stepperProgressCartData?.orderMode === 'enquiry') {
             console.log("enquiry");
             setLoading(true);
             try {
@@ -89,12 +89,12 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                     mode: 'order',
                     orderType: selectedOption
                 }
-                const checkoutResponse = await apiPOST(`/v1/payment/create-checkout/${enquiryId}`, payload);
+                const checkoutResponse = await apiPOST(`/v1/payment/create-checkout/${stepperProgressCartData?.enquiryId}`, payload);
                 if (checkoutResponse.status) {
                     const checkoutUrl = checkoutResponse?.data?.data?.url;
                     console.log(checkoutUrl);
                     setLoading(false);
-                    dispatch(resetUserCartData())
+                    // dispatch(resetUserCartData())
                     window.location.replace(checkoutUrl)
                 } else {
                     console.error("Failed to create checkout session:", checkoutResponse.data);
@@ -117,7 +117,7 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
     return <div>
         <div className="lg:flex gap-5 my-4">
             <div className="lg:w-1/2 flex flex-col">
-
+                {JSON.stringify}
                 <h2 className="text-2xl font-bold text-[18px]">Select Your Payment Method</h2>
                 <div className="space-y-4 p-4">
                     <div className={`flex items-center p-4 border rounded-lg bg-[#FFFFFF] ${selectedOption === 'online' ? 'border-green-500' : 'border-gray-300'}`}>
@@ -153,7 +153,7 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                 {/* <button className="bg-[#14967F] font-[600] text-[#FFFFFF] w-[200px] rounded-[30px] p-2 self-end" onClick={addOrderAndItems}>Proceed to Payment</button> */}
             </div>
             <div className="flex flex-col lg:w-1/2">
-                <PaymentSummary type="summary" item={stepperProgressCartData?.cartData ? stepperProgressCartData?.cartData : []} />
+                <PaymentSummary type="summary" item={stepperProgressCartData ? stepperProgressCartData : []} />
                 <AttachedPrescription type="cart" stepperProgressCartData={stepperProgressCartData} />
             </div>
         </div>

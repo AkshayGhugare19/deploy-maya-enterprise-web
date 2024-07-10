@@ -9,22 +9,26 @@ import "slick-carousel/slick/slick-theme.css";
 import Cardbrand from './cardbrand';
 import { apiGET } from '../../utilities/apiHelpers';
 import { useNavigate } from 'react-router-dom';
+import SimpleLoader from '../Loader/SimpleLoader';
 
 const Brand = () => {
   const [brands, setBrands] = useState([]);
   const sliderRef = useRef(null);
+  const [loading,setLoading] = useState(false)
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBrands = async () => {
+      setLoading(true);
       try {
         const response = await apiGET('v1/brand/all'); 
         setBrands(response.data.data);
-
+        setLoading(false);
         console.log(response)
       } catch (error) {
         console.error('Error fetching data:', error);
+        setLoading(false);
       }
     };
 
@@ -88,6 +92,10 @@ const Brand = () => {
     <div className='mt-10 w-full'>
       <div className=''>
         <div className='my-4 text-2xl font-bold'>Top Brands</div>
+        {
+          loading?
+          <SimpleLoader/>
+        :
         <div className='bg-[#F1F9FF] w-full'>
           <div className='px-10 py-8'>
             <div className='relative flex flex-wrap justify-between'>
@@ -115,6 +123,7 @@ const Brand = () => {
             </div>
           </div>
         </div>
+      }
       </div>
     </div>
   );

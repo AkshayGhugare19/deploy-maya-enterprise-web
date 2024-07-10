@@ -44,7 +44,6 @@ const EnquiryUploadPrescription = ({ type, setCurrentStep, stepperProgressCartDa
         if (selectedImageUrl.length) {
             const updateStepperProgressPayload = {
                 selectedPrescription: selectedImageUrl,
-                currentStep: 1
             }
             console.log("selectedImageUrl", selectedImageUrl);
             // dispatch(updateSelectedPrescription(selectedImageUrl))
@@ -53,7 +52,7 @@ const EnquiryUploadPrescription = ({ type, setCurrentStep, stepperProgressCartDa
                 console.log("userStepperAddResponse", userStepperAddResponse);
                 if (userStepperAddResponse.status) {
                     const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
-                    // setStepperProgressCartData(stepperResponse.data?.data);
+                    setStepperProgressCartData(stepperResponse.data?.data);
                 }
             } catch (error) {
                 console.log("Error updating seleted prescription", error);

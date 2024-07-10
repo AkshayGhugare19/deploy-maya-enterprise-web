@@ -134,7 +134,6 @@ function Login() {
       <div className="flex-1 p-10 bg-white">
         <div className="flex justify-between">
           <h4 className='text-xl font-extrabold mb-2'>Log in</h4>
-          <button className="text-gray-600 text-2xl font-bold">&times;</button>
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col">
           {Onclickphone ? (

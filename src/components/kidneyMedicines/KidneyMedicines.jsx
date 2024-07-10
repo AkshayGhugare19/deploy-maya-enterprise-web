@@ -3,13 +3,16 @@ import KidneyMedicinesCard from "./KidneyMedicinesCard"; // Adjust the import pa
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../../config';
 import { apiPOST } from '../../utilities/apiHelpers';
+import SimpleLoader from '../Loader/SimpleLoader';
 
 
 
 const KidneyMedicines = () => {
   const navigate = useNavigate()
   const [products, setProducts] = useState([]);
+  const [loading,setLoading] = useState(false);
   const getAllProduct = async () => {
+    setLoading(true)
     try {
       const payload = {
         "sortIndex": "",
@@ -20,11 +23,14 @@ const KidneyMedicines = () => {
       console.log("response>>>", response)
       if (response?.data?.status) {
         setProducts(response?.data?.data?.product);
+        setLoading(false);
       } else {
         console.error("Something went wrong");
+        setLoading(false)
       }
     } catch (error) {
       console.error("Something went wrong", error);
+      setLoading(false)
     }
   };
 
@@ -35,12 +41,17 @@ const KidneyMedicines = () => {
   return (
     <div className='my-8 w-full'>
       <div className=' font-bold text-2xl'>Kidney Medicines</div>
-      <KidneyMedicinesCard products={products} />
-      <div className='flex w-full items-center justify-center'>
-        <button onClick={() => navigate("/products")} className="mt-4 bg-[#14967F] hover:text-white px-7 py-2 rounded-full transition duration-300 transform hover:scale-105">
-          <span className=" font-semibold text-xs">Load nore</span>
-        </button>
+      {
+        loading ? <SimpleLoader /> :
+          <div>
+            <KidneyMedicinesCard products={products} />
+            <div className='flex w-full items-center justify-center'>
+              <button onClick={() => navigate("/products")} className="mt-4 bg-[#14967F] hover:text-white px-7 py-2 rounded-full transition duration-300 transform hover:scale-105">
+                <span className=" font-semibold text-xs">Load nore</span>
+              </button>
+            </div>
       </div>
+      }
 
     </div>
   )

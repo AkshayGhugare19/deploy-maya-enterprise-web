@@ -125,7 +125,6 @@ const VerifyOTP = () => {
       <div className="flex-1 p-10 bg-white">
         <div className="flex justify-between">
           <h2 className="text-2xl font-bold mb-4">Verify OTP</h2>
-          <button className="text-gray-600 text-2xl font-bold">&times;</button>
         </div>
         <div className="mb-8">
           <p className="text-gray-600 text-xs">

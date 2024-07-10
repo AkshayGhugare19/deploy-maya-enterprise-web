@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { apiGET, apiPUT } from "../../utilities/apiHelpers";
 import { API_URL } from "../../config";
 
-const ChooseMedicines = ({ setCurrentStep }) => {
+const ChooseMedicines = ({ setCurrentStep, stepperProgressCartData }) => {
     const [duration, setDuration] = useState(5);
     const [unit, setUnit] = useState('Days');
     const [selectedOption, setSelectedOption] = useState('asPerPrescription');
@@ -51,15 +51,30 @@ const ChooseMedicines = ({ setCurrentStep }) => {
         setSelectedOption(option);
         dispatch(updateSelectedPrescriptionType(option))
     };
-    const handleNextStep = () => {
-        dispatch(updateSelectedPrescriptionType(selectedOption))
-        dispatch(updateSelectedPrescriptionDurationUnit(unit))
-        dispatch(updateSelectedPrescriptionDuration(duration))
+    const handleNextStep = async () => {
+        const updatePayload = {
+            prescriptionType: selectedOption,
+            prescriptionDuration: duration,
+            prescriptionDurationUnit: unit,
+        }
+        try {
+            const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updatePayload);
+            console.log("userStepperAddResponse handleNextStep", userStepperAddResponse);
+            // if (userStepperAddResponse.status) {
+            //     const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
+            //     // setStepperProgressCartData(stepperResponse.data?.data);
+            // }
+        } catch (error) {
+            console.log("Error updating seleted prescription", error);
+        }
+        // dispatch(updateSelectedPrescriptionType(selectedOption))
+        // dispatch(updateSelectedPrescriptionDurationUnit(unit))
+        // dispatch(updateSelectedPrescriptionDuration(duration))
         setCurrentStep()
     };
     return <>
         <div className="p-6 mt-4 bg-white shadow-lg rounded-lg mx-auto">
-            <h2 className="text-lg font-semibold mb-4">Choose Your Medicines {selectedOption}{unit}{duration}</h2>
+            <h2 className="text-lg font-semibold mb-4">Choose Your Medicines</h2>
             <div className="flex lg:flex-row flex-col justify-between">
                 <div>
                     <div className="mb-4">
@@ -109,7 +124,7 @@ const ChooseMedicines = ({ setCurrentStep }) => {
                     </div>
                 </div>
                 <div className="lg:w-2/5 lg:border-l-2">
-                    <AttachedPrescription type="uploadPrescription" />
+                    <AttachedPrescription type="uploadPrescription" stepperProgressCartData={stepperProgressCartData} />
                 </div>
             </div>
             <button className="w-[130px] p-2 bg-[#14967F] mt-5 text-white font-semibold rounded-[30px]" onClick={handleNextStep}>

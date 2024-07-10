@@ -5,10 +5,13 @@ import "slick-carousel/slick/slick-theme.css";
 import './Slider.css'; // You can add custom styles here
 import { apiGET } from '../../utilities/apiHelpers';
 import { API_URL } from '../../config';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const MainSlider = () => {
   const [products, setProducts] = useState([]);
   const [initialSlide, setInitialSlide] = useState(0);
+  const [loading, setLoading] = useState(true); // State for loading
 
   const fetchBanners = async () => {
     try {
@@ -24,9 +27,11 @@ const MainSlider = () => {
       const initialIndex = sortedProducts.indexOf(initialProduct);
       setInitialSlide(initialIndex);
 
+      setLoading(false); // Set loading to false after data is fetched
       console.log('Products fetched and sorted:', sortedProducts);
     } catch (error) {
       console.error('Error fetching', error);
+      setLoading(false); // Set loading to false in case of an error
     }
   };
 
@@ -49,17 +54,21 @@ const MainSlider = () => {
 
   return (
     <div className="">
-      <Slider {...settings}>
-        {products.map((item, index) => (
-          <div key={item.id || index} className="flex justify-center items-center">
-            <img
-              src={item?.sliderImgUrl}
-              alt="Slider Image"
-              className="rounded-lg object-cover w-full h-[280px]"
-            />
-          </div>
-        ))}
-      </Slider>
+      {loading ? (
+        <Skeleton height={280} width="100%" borderRadius="0.5rem" baseColor='#ccecee'  />
+      ) : (
+        <Slider {...settings}>
+          {products.map((item, index) => (
+            <div key={item.id || index} className="flex justify-center items-center">
+              <img
+                src={item?.sliderImgUrl}
+                alt="Slider Image"
+                className="rounded-lg object-cover w-full h-[280px]"
+              />
+            </div>
+          ))}
+        </Slider>
+      )}
     </div>
   );
 }

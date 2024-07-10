@@ -4,13 +4,13 @@ import AddressStep from "../StepperRenderComponents/AddressStep";
 import { useDispatch, useSelector } from "react-redux";
 import { MdOutlineLocationOn } from "react-icons/md";
 import { setAddress } from "../../redux/users/users";
-import { apiGET, apiPOST, apiPUT } from "../../utilities/apiHelpers";
+import { apiDELETE, apiGET, apiPOST, apiPUT } from "../../utilities/apiHelpers";
 import { updateSelectedAddress } from "../../redux/carts/carts";
 import { toast } from "react-toastify";
 import Popup from "../Address/Popup";
 import { useNavigate } from "react-router-dom";
 
-const AddressDetails = () => {
+const AddressDetails = ({ stepperProgressCartData }) => {
     const [duration, setDuration] = useState(5);
     const [isOpen, setIsOpen] = useState(false);
     const [unit, setUnit] = useState('Days');
@@ -31,6 +31,7 @@ const AddressDetails = () => {
         setSelectedAddress(address)
         dispatch(updateSelectedAddress(address))
     }
+
     const getUserAddresses = async () => {
         const response = await apiGET(`/v1/address/getAddress/${userId}`)
         if (response.status) {
@@ -40,45 +41,57 @@ const AddressDetails = () => {
             console.error("Failed to fetch cart data", response);
         }
     }
-    const setSelectedAddressFunc = async () => {
-        if (selectedPrescription._id) {
-            const updatePrescriptionPayload = {
-                type: prescriptionType || 'order',
-                durationUnit: prescriptionDurationUnit,
-                durationOfDosage: prescriptionDuration,
-                addressId: prescriptionSelectedAddress._id
-            }
 
-            let updateResponse;
+    const setSelectedAddressFunc = async () => {
+        if (stepperProgressCartData?.selectedPrescription[0]?._id) {
+            // const updatePrescriptionPayload = {
+            //     type: stepperProgressCartData?.prescriptionType || 'order',
+            //     durationUnit: stepperProgressCartData?.prescriptionDurationUnit,
+            //     durationOfDosage: stepperProgressCartData?.prescriptionDuration,
+            //     addressId: selectedAddress._id
+            // }
+
+            // let updateResponse;
+            // try {
+            //     updateResponse = await apiPUT(`/v1/prescription/update-prescription-img/${stepperProgressCartData?.selectedPrescription[0]._id}`, updatePrescriptionPayload);
+            //     console.log("updateResponse", updateResponse);
+            // } catch (error) {
+            //     console.log("Error Updating prescription:", error);
+            // }
+            // if (updateResponse && updateResponse.status) {
+            const addOrderPayload = {
+                userId,
+                prescriptionId: stepperProgressCartData?.selectedPrescription[0]?._id,
+                mode: 'enquiry',
+                enquiryType: stepperProgressCartData?.prescriptionType || 'asPerPrescription',
+                enquiryStatus: 'awaiting_response',
+                durationUnit: stepperProgressCartData?.prescriptionDurationUnit,
+                durationOfDosage: stepperProgressCartData?.prescriptionDuration,
+                addressId: selectedAddress._id
+            }
             try {
-                updateResponse = await apiPUT(`/v1/prescription/update-prescription-img/${selectedPrescription._id}`, updatePrescriptionPayload);
-                console.log("updateResponse", updateResponse);
-            } catch (error) {
-                console.log("Error Updating prescription:", error);
-            }
-            if (updateResponse && updateResponse.status) {
-                const addOrderPayload = {
-                    userId,
-                    prescriptionId: selectedPrescription._id,
-                    mode: 'enquiry',
-                    enquiryType: prescriptionType || 'asPerPrescription',
-                    durationUnit: prescriptionDurationUnit,
-                    durationOfDosage: prescriptionDuration,
-                    addressId: prescriptionSelectedAddress._id
-                }
-                try {
-                    const addOrderResponse = await apiPOST(`/v1/order/add`, addOrderPayload);
-                    if (addOrderResponse.status) {
-                        console.log('addOrderResponse::', addOrderResponse)
-                        toast.success("Order Placed Successfully!");
-                        navigate('/enquiries')
-                    } else {
-                        toast.error('Error Adding Order');
+                const addOrderResponse = await apiPOST(`/v1/order/add`, addOrderPayload);
+                if (addOrderResponse.status) {
+                    console.log('addOrderResponse::', addOrderResponse)
+                    toast.success("Order Placed Successfully!");
+                    try {
+                        const updatePayload = {
+                            selectedAddress: selectedAddress
+                        }
+                        const response = await apiPUT(`/v1/stepper-progress/update-stepper-progress/${userId}`, updatePayload);
+                        if (response.status) {
+                            navigate('/enquiries')
+                        }
+                    } catch (error) {
+                        toast.error("Error Deleting progress")
                     }
-                } catch (error) {
-                    console.log('Error Placing order::', error)
+                } else {
+                    toast.error('Error Adding Order');
                 }
+            } catch (error) {
+                console.log('Error Placing order::', error)
             }
+            // }
         } else {
             toast.error("Please select address")
         }
@@ -115,7 +128,7 @@ const AddressDetails = () => {
                 </button>
             </div>
             <div className="lg:w-2/5 lg:border-l-2">
-                <AttachedPrescription type='uploadPrescription' />
+                <AttachedPrescription type='uploadPrescription' stepperProgressCartData={stepperProgressCartData} />
             </div>
         </div>
         {isOpen && <Popup isOpen={isOpen} setIsOpen={setIsOpen} />}

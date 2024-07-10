@@ -7,21 +7,26 @@ import left_arrow from '../../assest/image/left_arrow.svg';
 import right_arrow from '../../assest/image/right_arrow.svg';
 import Topcard from './TopProductCard';
 import { apiGET } from '../../utilities/apiHelpers';
+import SimpleLoader from '../Loader/SimpleLoader';
 
 
 
 const KidenyTopRated = () => {
   const sliderRef = useRef(null);
   const [products, setProducts] = useState([]);
+  const [loading,setLoading] = useState(false)
 
   useEffect(() => {
+    setLoading(true)
     const fetchProducts = async () => {
       try {
         const response = await apiGET('v1/product/getTopRatedProducts');
         setProducts(response.data.data.product);
         console.log(response)
+        setLoading(false)
       } catch (error) {
         console.error('Error fetching top-rated products:', error);
+        setLoading(false)
       }
     };
 
@@ -99,7 +104,12 @@ const KidenyTopRated = () => {
     <div className='w-full'>
       <div className='relative mt-10'>
         <div className='text-2xl font-semibold my-4'>Kidney care top products</div>
-        <img
+       {
+          loading ?
+            <SimpleLoader/>
+            :
+        <div>
+       <img
           className='absolute top-[52%] -translate-y-[50%] -left-4 z-10 cursor-pointer'
           onClick={handlePrevClick}
           src={left_arrow}
@@ -121,6 +131,8 @@ const KidenyTopRated = () => {
 
           ))}
         </Slider>
+       </div>
+       }
       </div>
     </div>
   );

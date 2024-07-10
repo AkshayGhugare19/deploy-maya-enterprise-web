@@ -50,8 +50,8 @@ export const publicPages = [
 	{ path: "/product/:id", exact: true, component: ProductDeyailsPage },
 	{ path: "/news", exact: true, component: News },
 	{ path: "/app", exact: true, component: App },
-	{ path: "/contact-us",exact:true,component:Contact},
-	{ path: "/faqs", exact:true, component:Faq},
+	{ path: "/contact-us", exact: true, component: Contact },
+	{ path: "/faqs", exact: true, component: Faq },
 	// { path: "/ban", exact: true, component: Banner },
 	{ path: "/address", exact: true, component: Popup },
 	{ path: "/success", exact: true, component: PaymentSuccess },
@@ -113,7 +113,7 @@ const SiteRoutes = () => {
 									) : (
 										<div className="min-h-screen  w-full">
 											<Navbar />
-											<ChildNavbar />
+											{route.path != '/view-cart' && <ChildNavbar />}
 											<div className="flex-grow">
 												<route.component />
 											</div>

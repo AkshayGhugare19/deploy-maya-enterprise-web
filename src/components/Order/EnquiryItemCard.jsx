@@ -5,7 +5,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { setEnquiryId, setOrderMode, updateOrderSummaryForEnquiry } from "../../redux/carts/carts";
-import { apiDELETE } from "../../utilities/apiHelpers";
+import { apiDELETE, apiGET, apiPOST, apiPUT } from "../../utilities/apiHelpers";
 import { toast } from "react-toastify";
 
 const EnquiryItemCard = ({ item }) => {
@@ -35,6 +35,57 @@ const EnquiryItemCard = ({ item }) => {
         }
     };
 
+    const updateOrderSummary = async (orderId, userId) => {
+        try {
+            const orderResponse = await apiGET(`/v1/order/${orderId}`);
+            if (orderResponse.status) {
+                console.log(orderResponse.data?.data[0]);
+                const orderItems = orderResponse.data?.data[0]?.orderItemData;
+                console.log("orderItems", orderResponse.data?.data[0].orderItemData);
+                if (orderItems && orderItems.length > 0) {
+                    const addToCartPayloads = orderItems.map(item => ({
+                        productId: item.productId,
+                        userId: userId,
+                        quantity: item.quantity || 1
+                    }));
+
+                    const addToCart = async (payload) => {
+                        try {
+                            const response = await apiPOST('/v1/cart/add', payload);
+                            return response;
+                        } catch (error) {
+                            // return rejectWithValue(error.response.data);
+                        }
+                    };
+                    await Promise.all(addToCartPayloads.map(payload => addToCart(payload)));
+                }
+                const userCartResponse = await apiGET(`/v1/cart/all-by-user/${userId}`);
+                if (userCartResponse.status) {
+                    console.log(userCartResponse.data?.data);
+                    const updatePayload = {
+                        cartData: userCartResponse.data?.data,
+                        selectedAddress: orderResponse.data?.data[0]?.addressDetails,
+                        selectedPrescription: [orderResponse.data?.data[0]?.prescriptionData],
+                        currentStep: 3
+                    }
+                    try {
+                        const response = await apiPUT(`/v1/stepper-progress/update-stepper-progress/${userId}`, updatePayload);
+                        console.log("update stepper progress", response);
+                    } catch (error) {
+                        console.log("Error", error);
+                    }
+                    // orderSummaryData.cartData = userCartResponse.data?.data;
+                } else {
+                    toast.error('Error Fetching cart Details')
+                }
+            } else {
+                toast.error('Error Fetching order Details')
+            }
+        } catch (error) {
+            toast.error('Something Went Wrong')
+        }
+    }
+
 
     const handleOrderSummary = async (orderId) => {
         console.log("orderId:", orderId);
@@ -50,9 +101,7 @@ const EnquiryItemCard = ({ item }) => {
             if (result.isConfirmed) {
                 const response = await apiDELETE(`/v1/cart/remove-user-cart`);
                 if (response.status) {
-                    dispatch(updateOrderSummaryForEnquiry({ orderId, userId }))
-                    dispatch(setOrderMode('enquiry'))
-                    dispatch(setEnquiryId(orderId))
+                    updateOrderSummary(orderId, userId);
                     navigate('/view-cart');
                 } else {
                     toast.error("Error Deleting Cart Items")

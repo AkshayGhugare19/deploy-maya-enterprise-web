@@ -9,6 +9,7 @@ import scrollToTop from "../../utilities/scrollToTop";
 import { apiDELETE, apiGET, apiPUT } from "../../utilities/apiHelpers";
 import { API_URL } from "../../config";
 import ButtonWithLoader from "../Button/ButtonWithLoader";
+import { toast } from "react-toastify";
 
 const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData }) => {
     const cartData = useSelector(state => state.cart?.cartData ? state.cart?.cartData : []);
@@ -67,7 +68,17 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
             setLoading(false)
         }
     }
+
+    const getUserStepperProgress = async () => {
+        try {
+            const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
+            setStepperProgressCartData(stepperResponse.data?.data);
+        } catch (error) {
+            toast.error(error)
+        }
+    }
     useEffect(() => {
+        getUserStepperProgress()
         scrollToTop()
     }, [])
     return <div>
@@ -87,7 +98,7 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
                 {/* <button className="bg-[#14967F] font-[600] text-[#FFFFFF] w-[200px] rounded-[30px] p-2 self-end	" onClick={setOrderSummary}>Proceed to Payment</button> */}
             </div>
             <div className="flex flex-col lg:w-1/2">
-                <PaymentSummary type="summary" item={stepperProgressCartData?.cartData ? stepperProgressCartData?.cartData : []} />
+                <PaymentSummary type="summary" item={stepperProgressCartData ? stepperProgressCartData : []} />
                 <AttachedPrescription type="cart" stepperProgressCartData={stepperProgressCartData} />
             </div>
         </div>

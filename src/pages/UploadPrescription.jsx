@@ -21,7 +21,7 @@ const UploadPrescription = () => {
 
     const handleCurrentStepUpdate = async (id) => {
         const updateStepperProgressPayload = {
-            currentStep: id
+            currentStepForUploadPres: id
         }
         try {
             const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
@@ -42,7 +42,7 @@ const UploadPrescription = () => {
             if (userStepperResponse?.data?.code == 400 && !userStepperResponse?.data?.status) {
                 const stepperProgressAddPayload = {
                     orderMode: 'enquiry',
-                    currentStep: 0
+                    currentStepForUploadPres: 0
                 }
                 const userStepperAddResponse = await apiPOST(`${API_URL}/v1/stepper-progress/add-stepper-progress/${userId}`, stepperProgressAddPayload);
                 console.log("userStepperAddResponse", userStepperAddResponse);
@@ -68,11 +68,11 @@ const UploadPrescription = () => {
     const renderStepComponent = (stepIndex) => {
         switch (stepIndex) {
             case 0:
-                return <EnquiryUploadPrescription type="uploadPrescription" setCurrentStep={() => handleCurrentStepUpdate(1)} />;
+                return <EnquiryUploadPrescription type="uploadPrescription" setCurrentStep={() => handleCurrentStepUpdate(1)} stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />;
             case 1:
-                return <ChooseMedicines setCurrentStep={() => handleCurrentStepUpdate(2)} />;
+                return <ChooseMedicines setCurrentStep={() => handleCurrentStepUpdate(2)} stepperProgressCartData={stepperProgressCartData} />;
             case 2:
-                return <AddressDetails />;
+                return <AddressDetails stepperProgressCartData={stepperProgressCartData} />;
             default:
                 return null;
         }
@@ -82,10 +82,10 @@ const UploadPrescription = () => {
             <h1 className='text-[#101010] font-bold text-lg'>Upload Prescription</h1>
             <div className='lg:flex  gap-4'>
                 <div className='lg:w-1/4 mt-4'>
-                    <PrescriptionStepper currentStep={stepperProgressCartData?.currentStep} steps={steps} />
+                    <PrescriptionStepper currentStep={stepperProgressCartData?.currentStepForUploadPres} steps={steps} />
                 </div>
                 <div className='w-full'>
-                    {renderStepComponent(stepperProgressCartData?.currentStep)}
+                    {renderStepComponent(stepperProgressCartData?.currentStepForUploadPres)}
                 </div>
             </div>
         </div>
