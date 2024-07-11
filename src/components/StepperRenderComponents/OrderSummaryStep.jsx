@@ -33,41 +33,52 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
         }
     };
 
-    const handleQuantityChange = async (type, id, quantity) => {
-        // dispatch(updateCartItemQuantity({ type, id, quantity }));
-        const updatedQuantity = type === 'increment' ? quantity + 1 : quantity - 1;
-        const payload = { quantity: updatedQuantity };
+    // const handleQuantityChange = async (type, id, quantity) => {
+    //     // dispatch(updateCartItemQuantity({ type, id, quantity }));
+    //     const updatedQuantity = type === 'increment' ? quantity + 1 : quantity - 1;
+    //     const payload = { quantity: updatedQuantity };
 
-        try {
-            const response = await apiPUT(`/v1/cart/update/${id}`, payload);
-            if (response.status) {
-                const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
-                setStepperProgressCartData(stepperResponse.data?.data);
-            } else {
-                // return rejectWithValue(response.data);
-            }
-        } catch (error) {
-            // return rejectWithValue(error.response.data);
+    //     try {
+    //         const response = await apiPUT(`/v1/cart/update/${id}`, payload);
+    //         if (response.status) {
+    //             const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
+    //             setStepperProgressCartData(stepperResponse.data?.data);
+    //         } else {
+    //             // return rejectWithValue(response.data);
+    //         }
+    //     } catch (error) {
+    //         // return rejectWithValue(error.response.data);
+    //     }
+    // };
+
+    const isDataValid = () => {
+        if (stepperProgressCartData && stepperProgressCartData?.cartData?.length !== 0) {
+            return stepperProgressCartData?.cartData?.some((ele) => ele?.quantity > ele?.productDetails?.productQuantity);
         }
+        return false;
     };
 
     const setOrderSummary = async () => {
         // dispatch(updateOrderSummary())
-        setLoading(true)
-        const updateStepperProgressPayload = {
-            currentStep: 4
-        }
-        try {
-            const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
-            console.log("userStepperAddResponse", userStepperAddResponse);
-            if (userStepperAddResponse.status) {
-                const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
-                setStepperProgressCartData(stepperResponse.data?.data);
+        if (!isDataValid()) {
+            setLoading(true)
+            const updateStepperProgressPayload = {
+                currentStep: 4
+            }
+            try {
+                const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
+                console.log("userStepperAddResponse", userStepperAddResponse);
+                if (userStepperAddResponse.status) {
+                    const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
+                    setStepperProgressCartData(stepperResponse.data?.data);
+                    setLoading(false)
+                }
+            } catch (error) {
+                console.log("Error updating seleted prescription", error);
                 setLoading(false)
             }
-        } catch (error) {
-            console.log("Error updating seleted prescription", error);
-            setLoading(false)
+        } else {
+            toast.error('Order Quantity Is Invalid')
         }
     }
 
@@ -92,7 +103,9 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
                         key={item._id}
                         item={item}
                         onDelete={() => handleRemoveCartItem(item._id)}
-                        onQuantityChange={(type) => handleQuantityChange(type, item._id, item.quantity)}
+                        // onQuantityChange={(type) => handleQuantityChange(type, item?._id, item?.quantity, item?.productDetails?.productQuantity)}
+                        stepperProgressCartData={setStepperProgressCartData}
+                        setStepperProgressCartData={setStepperProgressCartData}
                     />
                 ))}
                 <ButtonWithLoader loading={loading} buttonText={"Proceed to payment"} onClick={setOrderSummary} width={"w-[200px]"} />

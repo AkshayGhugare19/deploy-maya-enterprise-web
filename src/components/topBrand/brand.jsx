@@ -1,6 +1,4 @@
-
 import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 import left_arrow from '../../assest/image/left_arrow.svg';
 import right_arrow from '../../assest/image/right_arrow.svg';
 import Slider from "react-slick";
@@ -14,7 +12,7 @@ import SimpleLoader from '../Loader/SimpleLoader';
 const Brand = () => {
   const [brands, setBrands] = useState([]);
   const sliderRef = useRef(null);
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -25,7 +23,7 @@ const Brand = () => {
         const response = await apiGET('v1/brand/all'); 
         setBrands(response.data.data);
         setLoading(false);
-        console.log(response)
+        console.log(response);
       } catch (error) {
         console.error('Error fetching data:', error);
         setLoading(false);
@@ -35,50 +33,72 @@ const Brand = () => {
     fetchBrands();
   }, []);
 
-  const settings = {
+  const sliderSettings = (numItems) => ({
     dots: false,
-    infinite: true,
+    infinite: numItems > 1,
     speed: 500,
-    slidesToShow: 5,
+    slidesToShow: Math.min(Math.max(numItems, 2), 4),
     slidesToScroll: 1,
     arrows: false,
     responsive: [
       {
+        breakpoint: 2560,
+        settings: {
+          slidesToShow: Math.min(Math.max(numItems, 2), 6),
+          slidesToScroll: 1,
+          dots: false,
+        },
+      },
+      {
         breakpoint: 1424,
         settings: {
-          slidesToShow: 4,
+          slidesToShow: Math.min(Math.max(numItems, 2),6 ),
           slidesToScroll: 1,
-          infinite: true,
+          dots: false,
+        },
+      },
+      {
+        breakpoint: 1280,
+        settings: {
+          slidesToShow: Math.min(Math.max(numItems, 2), 6),
+          slidesToScroll: 1,
           dots: false,
         },
       },
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 3,
+          slidesToShow: Math.min(Math.max(numItems, 2), 4),
           slidesToScroll: 1,
-          infinite: true,
           dots: false,
         },
       },
       {
         breakpoint: 768,
         settings: {
-          slidesToShow: 2,
+          slidesToShow: Math.min(Math.max(numItems, 2), 3),
           slidesToScroll: 1,
           dots: false,
         },
       },
       {
-        breakpoint: 480,
+        breakpoint: 560,
         settings: {
-          slidesToShow: 1,
+          slidesToShow: Math.min(Math.max(numItems, 1), 1),
+          slidesToScroll: 1,
+          dots: false,
+        },
+      },
+      {
+        breakpoint: 320,
+        settings: {
+          slidesToShow: Math.min(Math.max(numItems, 1), 1),
           slidesToScroll: 1,
           dots: false,
         },
       },
     ],
-  };
+  });
 
   const handleNextClick = () => {
     sliderRef.current.slickNext();
@@ -92,38 +112,40 @@ const Brand = () => {
     <div className='mt-10 w-full'>
       <div className=''>
         <div className='my-4 text-2xl font-bold'>Top Brands</div>
-        {
-          loading?
-          <SimpleLoader/>
-        :
-        <div className='bg-[#F1F9FF] w-full'>
-          <div className='px-10 py-8'>
-            <div className='relative flex flex-wrap justify-between'>
-              <img
-                className='absolute top-16 -left-10 z-10'
-                onClick={handlePrevClick}
-                src={left_arrow}
-                alt="Previous"
-                width="60px"
-                height=""
-              />
-              <img
-                className='absolute top-16 right-0 z-10'
-                onClick={handleNextClick}
-                src={right_arrow}
-                alt="Next"
-                width="60px"
-                height=""
-              />
-              <Slider {...settings} ref={sliderRef} className='w-full'>
-                {brands.map((brand, index) => (
-                  <Cardbrand onClick={()=>{navigate(`/product/brand/${brand.id}`)}}   key={brand.id} item={{ src: brand.brandImgUrl }} index={index} />
-                ))}
-              </Slider>
+        {loading ? (
+          <SimpleLoader />
+        ) : (
+          <div className='bg-[#F1F9FF] w-full'>
+            <div className='px-10 py-8'>
+              <div className='relative flex justify-center items-center'>
+                <img
+                  className='absolute top-1/2 transform -translate-y-1/2 -left-10 z-10 cursor-pointer'
+                  onClick={handlePrevClick}
+                  src={left_arrow}
+                  alt="Previous"
+                  width="60px"
+                />
+                <img
+                  className='absolute top-1/2 transform -translate-y-1/2 -right-10 z-10 cursor-pointer'
+                  onClick={handleNextClick}
+                  src={right_arrow}
+                  alt="Next"
+                  width="60px"
+                />
+                <Slider {...sliderSettings(brands.length)} ref={sliderRef} className='w-full abc'>
+                  {brands.map((brand) => (
+                    <div key={brand.id} className="px-4">
+                      <Cardbrand
+                        onClick={() => navigate(`/product/brand/${brand.id}`)}
+                        item={{ src: brand.brandImgUrl }}
+                      />
+                    </div>
+                  ))}
+                </Slider>
+              </div>
             </div>
           </div>
-        </div>
-      }
+        )}
       </div>
     </div>
   );

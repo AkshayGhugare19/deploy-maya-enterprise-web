@@ -29,23 +29,50 @@ const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData }) => 
         }
     };
 
-    const handleQuantityChange = async (type, id, quantity) => {
-        // dispatch(updateCartItemQuantity({ type, id, quantity }));
-        const updatedQuantity = type === 'increment' ? quantity + 1 : quantity - 1;
-        const payload = { quantity: updatedQuantity };
+    // const handleQuantityChange = async (type, id, quantity, productQuantity) => {
+    //     // Increment case: ensure quantity does not exceed productQuantity
+    //     if (type === 'increment' && quantity < productQuantity) {
+    //         const updatedQuantity = quantity + 1;
+    //         const payload = { quantity: updatedQuantity };
+    //         console.log(quantity, productQuantity, type, id);
+    //         try {
+    //             setIncrementLoader(true)
+    //             const response = await apiPUT(`/v1/cart/update/${id}`, payload);
+    //             if (response.status) {
+    //                 const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`);
+    //                 setStepperProgressCartData(stepperResponse.data?.data);
+    //                 setIncrementLoader(false)
+    //             } else {
+    //                 // return rejectWithValue(response.data);
+    //                 setIncrementLoader(false)
+    //             }
+    //         } catch (error) {
+    //             // return rejectWithValue(error.response.data);
+    //             setIncrementLoader(false)
+    //         }
+    //     }
 
-        try {
-            const response = await apiPUT(`/v1/cart/update/${id}`, payload);
-            if (response.status) {
-                const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
-                setStepperProgressCartData(stepperResponse.data?.data);
-            } else {
-                // return rejectWithValue(response.data);
-            }
-        } catch (error) {
-            // return rejectWithValue(error.response.data);
-        }
-    };
+    //     if (type === 'decrement' && quantity > 1) {
+    //         const updatedQuantity = quantity - 1;
+    //         const payload = { quantity: updatedQuantity };
+    //         console.log(quantity, productQuantity, type, id);
+    //         try {
+    //             setDecrementLoader(true)
+    //             const response = await apiPUT(`/v1/cart/update/${id}`, payload);
+    //             if (response.status) {
+    //                 const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`);
+    //                 setStepperProgressCartData(stepperResponse.data?.data);
+    //                 setDecrementLoader(false)
+    //             } else {
+    //                 // return rejectWithValue(response.data);
+    //                 setDecrementLoader(false)
+    //             }
+    //         } catch (error) {
+    //             // return rejectWithValue(error.response.data);
+    //             setDecrementLoader(false)
+    //         }
+    //     }
+    // };
 
     // useEffect(() => {
     //     const fetchCartData = async () => {
@@ -78,7 +105,9 @@ const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData }) => 
                             key={item._id}
                             item={item}
                             onDelete={() => handleRemoveCartItem(item._id)}
-                            onQuantityChange={(type) => handleQuantityChange(type, item._id, item.quantity)}
+                            // onQuantityChange={(type) => handleQuantityChange(type, item?._id, item?.quantity, item?.productDetails?.productQuantity)}
+                            stepperProgressCartData={setStepperProgressCartData}
+                            setStepperProgressCartData={setStepperProgressCartData}
                         />
                     ))}
                 </div>

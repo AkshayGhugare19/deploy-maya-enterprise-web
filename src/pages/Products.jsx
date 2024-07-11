@@ -61,7 +61,7 @@ const Products = () => {
     };
 
     useEffect(() => {
-        fetchProducts(""); 
+        fetchProducts("");
         scrollToTop();// Fetch products for the default selected letter 'A' on mount
     }, []); // Empty dependency array ensures this runs only once
 
@@ -78,23 +78,20 @@ const Products = () => {
                     <div className="loader">Loading...</div>
                 </div>
                 :
-                <div>
-                    {products?.length ? <KidneyMedicinesCard products={products} />
-                        :
-                        <div className='flex justify-center item-center'>
-                            <div className='border border-[#095D7E] py-5 px-20 rounded-lg shadow-md '>Not Found</div>
-                        </div>
-                    }
-                    {/* Replace with your actual product rendering component */}
-                    {/* <div className="grid grid-cols-3 gap-4">
-                        {products.map(product => (
-                            <div key={product?.id} className="border p-4">
-                                <h3 className="text-xl font-bold">{product?.name}</h3>
-                                <p>{product?.description}</p>
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-1'>
+                    {products?.length ? (
+                        products.map((item) => (
+                            <KidneyMedicinesCard key={item.id} item={item} />
+                        ))
+                    ) : (
+                        <div className='col-span-full flex justify-center items-center'>
+                            <div className='border border-[#095D7E] py-5 px-20 rounded-lg shadow-md'>
+                                Not Found
                             </div>
-                        ))}
-                    </div> */}
+                        </div>
+                    )}
                 </div>
+
             }
             <Pagination
                 currentPage={pagination?.currentPage}
