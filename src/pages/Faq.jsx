@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import scrollToTop from '../utilities/scrollToTop';
+
 
 const Faq = () => {
+  useEffect(()=>{
+    scrollToTop();
+  })
   const faqData = [
     {
       question: 'How does the billing work?',

@@ -2,10 +2,17 @@ import React, { useState } from 'react';
 import UpdateProfileStepper from '../Steppers/UpdateProfileStepper';
 import EditProfile from './EditProfile';
 import EditAddress from './EditAddress';
+import { useEffect } from 'react';
+import scrollToTop from '../../utilities/scrollToTop';
+
 
 function UpdateProfile() {
     const [currentStep, setCurrentStep] = useState(0);
     const steeperArray = ["Profile Details","Address Details"];
+
+    useEffect(()=>{
+        scrollToTop();
+    },[])
 
     const goToProfileStep = () => {
         setCurrentStep(0);
@@ -27,7 +34,7 @@ function UpdateProfile() {
                 return null;
         }
     };
-
+    
     return (
         <div className='lg:min-h-[500px]'>
             <UpdateProfileStepper currentStep={currentStep} steeperArray={steeperArray} setCurrentStep={currentStep} goToProfileStep={goToProfileStep} goToAddressStep={goToAddressStep}  />

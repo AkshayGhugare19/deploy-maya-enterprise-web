@@ -3,9 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { BiArrowBack } from 'react-icons/bi';
 import { apiGET } from '../utilities/apiHelpers';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSuccessData } from '../redux/success/success';
 import { apiDELETE } from '../utilities/apiHelpers';
 import { resetUserCartData } from '../redux/carts/carts';
+import { toast } from 'react-toastify';
 
 
 const PaymentSuccess = () => {
@@ -13,7 +13,6 @@ const PaymentSuccess = () => {
   const dispatch = useDispatch()
   const location = useLocation();
   const hasFetched = useRef(false);
-  const { successData } = useSelector((state) => state.successInfo);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const userId = useSelector((state) => state.user.userData.id) || ''
@@ -27,7 +26,7 @@ const PaymentSuccess = () => {
       }
     } catch (error) {
       console.error('Error fetching session info: ', error);
-      alert('Error fetching session info');
+      toast.error('Error fetching session info');
     } finally {
       setLoading(false);
     }
@@ -43,7 +42,7 @@ const PaymentSuccess = () => {
       }
     } catch (error) {
       console.error('Error fetching delete response info: ', error);
-      alert('Error fetching session info');
+      toast.error('Error fetching session info');
     } finally {
       setLoading(false);
     }
@@ -56,9 +55,6 @@ const PaymentSuccess = () => {
     const params = new URLSearchParams(location.search);
     const sessionId = params.get('session_id');
     if (sessionId) {
-      dispatch(setSuccessData(sessionId));
-      const newUrl = location.pathname;
-      navigate(newUrl, { replace: true });
       getSessionInfo(sessionId);
       deleteUserStepperProgress()
     }
@@ -100,22 +96,22 @@ const PaymentSuccess = () => {
             </div>
             <div className="md:w-1/2 mt-6 md:mt-0 bg-white p-6 rounded-lg shadow">
               <h2 className="text-2xl font-semibold mb-4 text-center">
-                {successData && formatCurrency(successData.amount, successData.currency)}
+                {data && formatCurrency(data.amount, data.currency)}
               </h2>
               <p className="text-green-600 text-lg mb-6 text-center">Payment success!</p>
               <div className="text-left">
                 <h4 className="text-lg font-semibold mb-2">Payment details</h4>
                 <p className="text-sm text-gray-600 mb-2">
-                  Date: <span className="font-semibold">{successData && new Date(successData.created * 1000).toLocaleString()}</span>
+                  Date: <span className="font-semibold">{data && new Date(data.created * 1000).toLocaleString()}</span>
                 </p>
                 <p className="text-sm text-gray-600 mb-2">
-                  Reference number: <span className="font-semibold">{successData && successData.id}</span>
+                  Reference number: <span className="font-semibold">{data && data.id}</span>
                 </p>
                 <p className="text-sm text-gray-600 mb-2">
-                  Amount: <span className="font-semibold">{successData && formatCurrency(successData.amount, successData.currency)}</span>
+                  Amount: <span className="font-semibold">{data && formatCurrency(data.amount, data.currency)}</span>
                 </p>
                 <p className="text-sm text-gray-600 mb-2">
-                  Payment status: <span className="font-semibold text-green-600">{successData && 'Success'}</span>
+                  Payment status: <span className="font-semibold text-green-600">{data && 'Success'}</span>
                 </p>
               </div>
             </div>

@@ -5,6 +5,7 @@ import { apiPOST } from '../utilities/apiHelpers';
 import { toast } from 'react-toastify';
 import 'tailwindcss/tailwind.css';
 import KidneyMedicinesCard from '../components/kidneyMedicines/KidneyMedicinesCard';
+import scrollToTop from '../utilities/scrollToTop';
 
 const Products = () => {
     const [products, setProducts] = useState([]);
@@ -60,7 +61,8 @@ const Products = () => {
     };
 
     useEffect(() => {
-        fetchProducts(""); // Fetch products for the default selected letter 'A' on mount
+        fetchProducts(""); 
+        scrollToTop();// Fetch products for the default selected letter 'A' on mount
     }, []); // Empty dependency array ensures this runs only once
 
 

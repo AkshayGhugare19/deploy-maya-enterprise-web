@@ -6,12 +6,14 @@ import { toast } from 'react-toastify';
 import userIcon from "../../assest/icons/userIcon.png";
 import loggedUserIcon from "../../assest/icons/loggedUserIcon.png";
 import cartIcon from "../../assest/icons/cartIcon.png";
+import { apiGET } from '../../utilities/apiHelpers';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.user);
   const cartData = useSelector((state) => state.cart.cartData) || [];
+  const cartCount = useSelector((state) => state.user.cartCount) || 0;
   const [isOpen, setIsOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(false);
 
@@ -33,6 +35,22 @@ const Navbar = () => {
       setUserInfo(false);
     }
   };
+
+  const navigateToViewCart = async () => {
+    try {
+      if (!userData?.id) {
+        toast.info('Please login to proceed')
+      }
+      // const response = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userData.id}`)
+      if (!cartCount) {
+        toast.error('Cart is Empty')
+      } else {
+        navigate('/view-cart')
+      }
+    } catch (error) {
+      toast.error('Error Fetching Stepper Info')
+    }
+  }
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
@@ -59,12 +77,12 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
-          <div className="cursor-pointer text-gray-900 hover:text-teal-600  py-2 rounded-md text-sm font-medium "  onClick={() =>userData?navigate('/orders'):toast.info("Please login to proceed")}>Orders</div>
-            <div onClick={() =>userData?navigate('/view-cart'):toast.info("Please login to proceed")} className="relative cursor-pointer flex items-center space-x-2 text-gray-900 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium">
+            <div className="cursor-pointer text-gray-900 hover:text-teal-600  py-2 rounded-md text-sm font-medium " onClick={() => userData ? navigate('/orders') : toast.info("Please login to proceed")}>Orders</div>
+            <div onClick={navigateToViewCart} className="relative cursor-pointer flex items-center space-x-2 text-gray-900 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium">
               <img src={cartIcon} alt="Cart Icon" className="h-5 w-5" />
               <div className='font-medium'>Cart</div>
               <div className="absolute top-0 right-1 bg-red-500 text-white px-1 rounded-full text-xs">
-                {cartData.length}
+                {cartCount ? cartCount : ''}
               </div>
             </div>
             <div className="relative" ref={dropdownRef}>
@@ -90,7 +108,7 @@ const Navbar = () => {
                           onClick={() => navigate('/updateprofile')}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
-                          View Profile 
+                          View Profile
                         </button>
                         {/* <button
                           onClick={() => navigate('/saved-prescription')}
@@ -165,7 +183,7 @@ const Navbar = () => {
             <button onClick={() => navigate('/orders')} className="text-gray-900 hover:text-teal-600 block px-3 py-2 rounded-md text-base font-medium">Orders</button>
           </li>
           <li className="flex items-center justify-center">
-            <button onClick={() => navigate('/view-cart')} className="w-full flex items-center justify-center border hover:bg-gray-100 space-x-2 px-3 py-2 rounded-full text-sm font-medium">
+            <button onClick={navigateToViewCart} className="w-full flex items-center justify-center border hover:bg-gray-100 space-x-2 px-3 py-2 rounded-full text-sm font-medium">
               <img src={cartIcon} alt="Cart Icon" className="h-5 w-5" />
               <div>Cart</div>
             </button>

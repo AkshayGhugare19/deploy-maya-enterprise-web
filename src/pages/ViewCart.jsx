@@ -66,7 +66,8 @@ const ViewCart = () => {
                 const userStepperAddResponse = await apiPOST(`${API_URL}/v1/stepper-progress/add-stepper-progress/${userId}`, stepperProgressAddPayload);
                 console.log("userStepperAddResponse", userStepperAddResponse);
                 setStepperProgressCartData(userStepperAddResponse.data?.data);
-            } else {
+            }
+            else {
                 setStepperProgressCartData(userStepperResponse.data?.data);
             }
             console.log("response", userStepperResponse);
@@ -77,10 +78,7 @@ const ViewCart = () => {
 
     useEffect(() => {
         dispatch(fetchGlobalConfig())
-        const fetchProgress = async () => {
-            await getUserStepperProgress();
-        };
-        fetchProgress();
+        getUserStepperProgress();
         console.log(stepperProgressCartData?.currentStep);
         // return () => {
         //     dispatch(resetStateForEnquiry());

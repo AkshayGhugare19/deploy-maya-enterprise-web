@@ -7,6 +7,7 @@ import ReactPaginate from 'react-paginate';
 import { FiEye } from "react-icons/fi";
 import { MdKeyboardBackspace } from "react-icons/md";
 import moment from "moment";
+import scrollToTop from "../utilities/scrollToTop";
 
 const Orders = () => {
     const userId = useSelector((state) => state.user?.userData?.id) || '';
@@ -27,7 +28,9 @@ const Orders = () => {
     useEffect(() => {
         getUserOrder();
     }, [userId]);
-
+    useEffect(()=>{
+       scrollToTop(); 
+    })
     const handlePageClick = ({ selected }) => {
         setCurrentPage(selected);
     };
@@ -58,6 +61,9 @@ const Orders = () => {
                             <thead>
                                 <tr>
                                     <th className="py-2 px-2 text-left bg-[#14967F] text-white border-b">Order ID</th>
+                                    <th className="py-2 px-2 text-left bg-[#14967F] text-white border-b">Order Mode</th>
+                                    <th className="py-2 px-2 text-left bg-[#14967F] text-white border-b">Order Type</th>
+                                    <th className="py-2 px-2 text-left bg-[#14967F] text-white border-b">Status</th>
                                     <th className="py-2 px-2 text-left bg-[#14967F] text-white border-b">Order Date</th>
                                     <th className="py-2 px-2 text-left bg-[#14967F] text-white border-b">Order Items</th>
                                     <th className="py-2 px-2 bg-[#14967F] text-white border-b">View</th>
@@ -76,6 +82,9 @@ const Orders = () => {
                                     currentItems.map((item) => (
                                         <tr key={item.id} className="hover:bg-[#ccecee]">
                                             <td className="py-2 px-2 border-b">{item?._id || "--"}</td>
+                                            <td className="py-2 px-2 border-b">{item?.mode || "--"}</td>
+                                            <td className="py-2 px-2 border-b">{item?.orderType?item?.orderType:"--"}</td>
+                                            <td className="py-2 px-2 border-b">{item?.status?item?.status:"--"}</td>
                                             <td className="py-2 px-2 border-b">
                                                 {moment(item?.createdAt || "09/07/24").format("DD/MM/YY")}
                                             </td>

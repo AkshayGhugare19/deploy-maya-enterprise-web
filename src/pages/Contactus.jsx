@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faDollarSign, faNewspaper, faBug } from '@fortawesome/free-solid-svg-icons';
+import scrollToTop from '../utilities/scrollToTop';
+
 const iconMap = {
   phone: faPhone,
   'dollar-sign': faDollarSign,
@@ -9,6 +11,10 @@ const iconMap = {
 };
 
 const ContactUs = () => {
+  useEffect(()=>{
+    scrollToTop();
+
+  },[])
   return (
     <div className="container mx-auto p-8">
       <h2 className="text-center text-3xl font-bold mb-8">Contact us</h2>

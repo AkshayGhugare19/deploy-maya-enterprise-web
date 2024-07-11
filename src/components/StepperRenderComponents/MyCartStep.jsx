@@ -5,6 +5,7 @@ import { apiDELETE, apiGET, apiPUT } from "../../utilities/apiHelpers";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteCartItem, setCart, setOrderMode, updateCartItemQuantity } from "../../redux/carts/carts";
 import scrollToTop from "../../utilities/scrollToTop";
+import { setCartCount } from "../../redux/users/users";
 
 const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData }) => {
     // const [cartData, setCartData] = useState([]);
@@ -19,6 +20,7 @@ const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData }) => 
             if (response.status) {
                 const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
                 setStepperProgressCartData(stepperResponse.data?.data);
+                dispatch(setCartCount(stepperResponse.data?.data?.cartData?.length))
             } else {
                 // return rejectWithValue(response.data);
             }
@@ -45,25 +47,25 @@ const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData }) => 
         }
     };
 
-    useEffect(() => {
-        const fetchCartData = async () => {
-            try {
-                if (userId) {
-                    const response = await apiGET(`/v1/cart/all-by-user/${userId}`);
-                    if (response.status) {
-                        console.log(response?.data?.data);
-                        dispatch(setCart(response?.data?.data));
-                    } else {
-                        console.error("Failed to fetch cart data", response);
-                    }
-                }
-            } catch (error) {
-                console.error("Error fetching cart data", error);
-            }
-        };
-        scrollToTop();
-        fetchCartData();
-    }, []);
+    // useEffect(() => {
+    //     const fetchCartData = async () => {
+    //         try {
+    //             if (userId) {
+    //                 const response = await apiGET(`/v1/cart/all-by-user/${userId}`);
+    //                 if (response.status) {
+    //                     console.log(response?.data?.data);
+    //                     dispatch(setCart(response?.data?.data));
+    //                 } else {
+    //                     console.error("Failed to fetch cart data", response);
+    //                 }
+    //             }
+    //         } catch (error) {
+    //             console.error("Error fetching cart data", error);
+    //         }
+    //     };
+    //     scrollToTop();
+    //     fetchCartData();
+    // }, []);
 
     return (
         <>

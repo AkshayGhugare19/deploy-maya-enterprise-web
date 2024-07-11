@@ -16,15 +16,53 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
     const orderMode = useSelector((state) => state.cart?.orderMode) || '';
     const enquiryId = useSelector((state) => state.cart?.enquiryId) || '';
     const [selectedOption, setSelectedOption] = useState('online');
-    const [loading,setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const handleOptionChange = (event) => {
         setSelectedOption(event.target.value);
     };
     const addOrderAndItems = async () => {
-        if (stepperProgressCartData?.orderMode === 'order') {
+        // if (stepperProgressCartData?.orderMode === 'order') {
         setLoading(true);
+        if(selectedOption === 'cod'){
+           const addCodOrderPayload = {
+            userId,
+            addressId: stepperProgressCartData?.selectedAddress?._id,
+            prescriptionId: stepperProgressCartData?.selectedPrescription[0]?._id,
+            orderType: selectedOption,
+            mode: 'order',
+            totalPayment: stepperProgressCartData?.totalCartAmount
+        }
+        try {
+            const addCodOrderResponse = await apiPOST(`/v1/order/add`, addCodOrderPayload);
+            if(addCodOrderResponse){
+                if (addCodOrderResponse?.data?.data && stepperProgressCartData?.cartData?.length) {
+                    stepperProgressCartData?.cartData && stepperProgressCartData?.cartData?.length !== 0 && stepperProgressCartData?.cartData?.map(async (item) => {
+                        console.log(addCodOrderResponse?.data);
+                        const addOrderItemPayload = {
+                            orderId: addCodOrderResponse?.data?.data?.id,
+                            productId: item?.productId,
+                            quantity: item?.quantity,
+                        }
+                        try {
+                            const orderItemResponse = await apiPOST(`/v1/order-item/add`, addOrderItemPayload);
+                            if(orderItemResponse){
+                                toast.success('Order Placed successfully')
+                                setLoading(false);
+                                navigate(`/cod-success-page/${addCodOrderResponse?.data?.data?.id}`)
+                            }
+                        } catch (error) {
+                            console.log("Error Order Adding Item::", error);
+                        }
+                    })}
+               
+            }
+        }catch(error){
+            console.log('Error adding COD order::', error)
+            setLoading(false);
+        }
+        }else{
             try {
                 const addOrderPayload = {
                     userId,
@@ -37,6 +75,7 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                 let addOrderResponse;
                 try {
                     addOrderResponse = await apiPOST(`/v1/order/add`, addOrderPayload);
+                    
                 } catch (error) {
                     console.log("Error Placing order::", addOrderResponse);
                 }
@@ -60,7 +99,11 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                         console.log("addOrderResponse::", addOrderResponse?.data?.data);
                         if (addOrderResponse?.data?.data?.id) {
                             setLoading(true)
-                            const checkoutResponse = await apiPOST(`/v1/payment/create-checkout/${addOrderResponse?.data?.data?.id}`);
+                            const payload = {
+                                mode: 'order',
+                                orderType: selectedOption
+                            }
+                            const checkoutResponse = await apiPOST(`/v1/payment/create-checkout/${addOrderResponse?.data?.data?.id}`,payload);
                             if (checkoutResponse.status) {
                                 setLoading(false)
                                 const checkoutUrl = checkoutResponse?.data?.data?.url;
@@ -81,34 +124,38 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                 toast.error('Error', error)
                 setLoading(false)
             }
-        } else if (stepperProgressCartData?.orderMode === 'enquiry') {
-            console.log("enquiry");
-            setLoading(true);
-            try {
-                const payload = {
-                    mode: 'order',
-                    orderType: selectedOption
-                }
-                const checkoutResponse = await apiPOST(`/v1/payment/create-checkout/${stepperProgressCartData?.enquiryId}`, payload);
-                if (checkoutResponse.status) {
-                    const checkoutUrl = checkoutResponse?.data?.data?.url;
-                    console.log(checkoutUrl);
-                    setLoading(false);
-                    // dispatch(resetUserCartData())
-                    window.location.replace(checkoutUrl)
-                } else {
-                    console.error("Failed to create checkout session:", checkoutResponse.data);
-                    setLoading(false);
-                }
-
-            } catch (error) {
-                console.log("Error Placing order::", error);
-                setLoading(false);
-            }
-        } else {
-            toast.error("Failed to make payment")
-            setLoading(false);
+            // } else if (stepperProgressCartData?.orderMode === 'enquiry') {
+            //     console.log("enquiry");
+            //     setLoading(true);
+            //     try {
+            //         const payload = {
+            //             mode: 'order',
+            //             orderType: selectedOption
+            //         }
+            //         const checkoutResponse = await apiPOST(`/v1/payment/create-checkout/${stepperProgressCartData?.enquiryId}`, payload);
+            //         if (checkoutResponse.status) {
+            //             const checkoutUrl = checkoutResponse?.data?.data?.url;
+            //             console.log(checkoutUrl);
+            //             setLoading(false);
+            //             // dispatch(resetUserCartData())
+            //             window.location.replace(checkoutUrl)
+            //         } else {
+            //             console.error("Failed to create checkout session:", checkoutResponse.data);
+            //             setLoading(false);
+            //         }
+    
+            //     } catch (error) {
+            //         console.log("Error Placing order::", error);
+            //         setLoading(false);
+            //     }
+            // } 
+            // else {
+            //     toast.error("Failed to make payment")
+            //     setLoading(false);
+            // }
+            // };
         }
+       
     };
 
     useEffect(() => {
@@ -149,7 +196,7 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                         </label>
                     </div>
                 </div>
-                <ButtonWithLoader loading={loading} buttonText={"Proceed to payment"} onClick={addOrderAndItems} width={"w-[200px]"}/>
+                <ButtonWithLoader loading={loading} buttonText={`${selectedOption === 'cod'? "Place order":"Proceed to payment"}`} onClick={addOrderAndItems} width={"w-[200px]"} />
                 {/* <button className="bg-[#14967F] font-[600] text-[#FFFFFF] w-[200px] rounded-[30px] p-2 self-end" onClick={addOrderAndItems}>Proceed to Payment</button> */}
             </div>
             <div className="flex flex-col lg:w-1/2">

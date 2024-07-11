@@ -102,7 +102,7 @@ const EnquiryItemCard = ({ item }) => {
                 const response = await apiDELETE(`/v1/cart/remove-user-cart`);
                 if (response.status) {
                     updateOrderSummary(orderId, userId);
-                    navigate('/view-cart');
+                    navigate(`/order-summary/${orderId}`);
                 } else {
                     toast.error("Error Deleting Cart Items")
                 }

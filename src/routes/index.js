@@ -37,6 +37,8 @@ import Enquiries from "../pages/Enquiries";
 import Contactus from "../pages/Contactus";
 import Faq from "../pages/Faq";
 import AuthListener from "../utilities/authListener";
+import EnquiryOrderSummary from "../pages/EnquiryOrderSummary";
+import CodSuccessPage from "../pages/CodSuccessPage";
 
 
 export const publicPages = [
@@ -55,6 +57,7 @@ export const publicPages = [
 	// { path: "/ban", exact: true, component: Banner },
 	{ path: "/address", exact: true, component: Popup },
 	{ path: "/success", exact: true, component: PaymentSuccess },
+	{ path: "/cod-success-page/:id", exact: true, component: CodSuccessPage },
 
 
 	{ path: "/updateprofile", exact: true, component: UpdateProfile },
@@ -66,7 +69,8 @@ export const publicPages = [
 	{ path: "/order/:id", exact: true, component: OrderItems },
 	{ path: "/upload-prescription", exact: true, component: UploadPrescription },
 	{ path: "/product/brand/:id", exact: true, component: BrandProducts },
-	{ path: "/enquiries", exact: true, component: Enquiries }
+	{ path: "/enquiries", exact: true, component: Enquiries },
+	{ path: "/order-summary/:id", exact: true, component: EnquiryOrderSummary }
 
 
 ];

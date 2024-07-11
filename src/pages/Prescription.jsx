@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { apiGET } from '../utilities/apiHelpers';
 import { useSelector } from 'react-redux';
 import PrescriptionCard from '../components/presecription/PrescriptionCard';
+import scrollToTop from '../utilities/scrollToTop';
 
 function Prescription() {
   const [prescriptions, setPrescriptions] = useState([]);
@@ -24,6 +25,9 @@ function Prescription() {
     fetchPrescriptions();
   }, [usersid]);
 
+  useEffect(()=>{
+    scrollToTop();
+  })
   if (loading) {
     return <div>Loading...</div>;
   }

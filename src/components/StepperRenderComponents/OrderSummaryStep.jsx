@@ -10,12 +10,13 @@ import { apiDELETE, apiGET, apiPUT } from "../../utilities/apiHelpers";
 import { API_URL } from "../../config";
 import ButtonWithLoader from "../Button/ButtonWithLoader";
 import { toast } from "react-toastify";
+import { setCartCount } from "../../redux/users/users";
 
 const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData }) => {
     const cartData = useSelector(state => state.cart?.cartData ? state.cart?.cartData : []);
     const userId = useSelector((state) => state.user?.userData?.id);
     const dispatch = useDispatch()
-    const [loading,setLoading] = useState(false)
+    const [loading, setLoading] = useState(false)
     const handleRemoveCartItem = async (id) => {
         // dispatch(deleteCartItem(id));
         try {
@@ -23,6 +24,7 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
             if (response.status) {
                 const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
                 setStepperProgressCartData(stepperResponse.data?.data);
+                dispatch(setCartCount(stepperResponse.data?.data?.cartData?.length))
             } else {
                 // return rejectWithValue(response.data);
             }
@@ -93,7 +95,7 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
                         onQuantityChange={(type) => handleQuantityChange(type, item._id, item.quantity)}
                     />
                 ))}
-                <ButtonWithLoader loading={loading} buttonText={"Proceed to payment"} onClick={setOrderSummary} width={"w-[200px]"}/>
+                <ButtonWithLoader loading={loading} buttonText={"Proceed to payment"} onClick={setOrderSummary} width={"w-[200px]"} />
 
                 {/* <button className="bg-[#14967F] font-[600] text-[#FFFFFF] w-[200px] rounded-[30px] p-2 self-end	" onClick={setOrderSummary}>Proceed to Payment</button> */}
             </div>

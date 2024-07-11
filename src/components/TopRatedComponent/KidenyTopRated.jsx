@@ -11,10 +11,10 @@ import SimpleLoader from '../Loader/SimpleLoader';
 
 
 
-const KidenyTopRated = () => {
+const KidenyTopRated = ({ stepperProgressCartData, setStepperProgressCartData }) => {
   const sliderRef = useRef(null);
   const [products, setProducts] = useState([]);
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -104,35 +104,35 @@ const KidenyTopRated = () => {
     <div className='w-full'>
       <div className='relative mt-10'>
         <div className='text-2xl font-semibold my-4'>Kidney care top products</div>
-       {
+        {
           loading ?
-            <SimpleLoader/>
+            <SimpleLoader />
             :
-        <div>
-       <img
-          className='absolute top-[52%] -translate-y-[50%] -left-4 z-10 cursor-pointer'
-          onClick={handlePrevClick}
-          src={left_arrow}
-          width="60px"
-          height=""
-          alt="Previous"
-        />
-        <img
-          className='absolute top-[52%] -translate-y-[50%] -right-4 z-10 cursor-pointer'
-          onClick={handleNextClick}
-          src={right_arrow}
-          width="60px"
-          height=""
-          alt="Next"
-        />
-        <Slider {...sliderSettings(products.length)} ref={sliderRef} className=''>
-          {products.map((item, index) => (
-            <Topcard item={item} index={index} />
+            <div>
+              <img
+                className='absolute top-[52%] -translate-y-[50%] -left-4 z-10 cursor-pointer'
+                onClick={handlePrevClick}
+                src={left_arrow}
+                width="60px"
+                height=""
+                alt="Previous"
+              />
+              <img
+                className='absolute top-[52%] -translate-y-[50%] -right-4 z-10 cursor-pointer'
+                onClick={handleNextClick}
+                src={right_arrow}
+                width="60px"
+                height=""
+                alt="Next"
+              />
+              <Slider {...sliderSettings(products.length)} ref={sliderRef} className=''>
+                {products.map((item, index) => (
+                  <Topcard item={item} index={index} stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />
 
-          ))}
-        </Slider>
-       </div>
-       }
+                ))}
+              </Slider>
+            </div>
+        }
       </div>
     </div>
   );

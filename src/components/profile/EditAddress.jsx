@@ -65,8 +65,8 @@ const AddressCard = () => {
     }
 
     return (
-        <div className="flex items-center justify-center p-4">
-            <div className=" bg-white rounded p-5 border min-w-[793px]">
+        <div className="flex flex-wrap items-center justify-center p-4">
+            <div className=" bg-white p-8 rounded-lg shadow-md w-full max-w-[793px]">
                 {addressData.map((address, index) => (
                     <div key={index} className="bg-[#F8F8F8] text-xs p-4 rounded-lg shadow-md relative my-5 ">
                         <div className="flex flex-col md:flex-row md:space-x-4">

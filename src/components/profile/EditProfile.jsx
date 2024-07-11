@@ -96,7 +96,7 @@ function EditProfile() {
                             placeholder="Enter mobile number"
                             value={userDetails.phoneNo}
                             onChange={handleChange}
-                            className="mt-1 block w-[50%] p-3 text-xs border outline-none border-gray-300 bg-[#F8F8F8] rounded"
+                            className="mt-1 block w-[48%] p-3 text-xs border outline-none border-gray-300 bg-[#F8F8F8] rounded"
                         />
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t-2 border-t-gray-200 space-x-4 px-4">
