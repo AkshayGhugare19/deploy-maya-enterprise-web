@@ -20,10 +20,10 @@ const UploadPrescriptionStep = ({ type, setCurrentStep, stepperProgressCartData,
     const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
     const [uploadStatus, setUploadStatus] = useState('');
     const userId = useSelector((state) => state.user?.userData?.id) || ""
-    const loggedInUserCartData = useSelector((state) => state.cart.cartData) || []
+    // const loggedInUserCartData = useSelector((state) => state.cart.cartData) || []
     const [loading, setLoading] = useState(false);
     const checkIsPriscriptionMandatory = () => {
-        return stepperProgressCartData?.cartData.some((item) => item.productDetails?.isPrescription === true);
+        return stepperProgressCartData?.cartData?.some((item) => item.productDetails?.isPrescription === true);
     }
 
     const getAllSavedPrescription = async () => {
@@ -142,7 +142,7 @@ const UploadPrescriptionStep = ({ type, setCurrentStep, stepperProgressCartData,
                             setSelectedImageUrl={setSelectedImageUrl} />
                     }
                     <div className="flex justify-end">
-                    <ButtonWithLoader loading={loading} buttonText={"Submit"} onClick={selectedPrescription} width={"w-[100px]"}/>
+                        <ButtonWithLoader loading={loading} buttonText={"Submit"} onClick={selectedPrescription} width={"w-[100px]"} />
 
                         {/* <button
                             className="w-[100px] py-2 bg-[#14967F] text-white rounded-[30px] mt-4"

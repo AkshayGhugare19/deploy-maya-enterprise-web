@@ -140,9 +140,9 @@ const ChildNavbar = () => {
                             )}
                         </div>
                     </div>
-                    <button className="bg-[#14967F] w-full lg:w-52 h-10 text-white text-center flex justify-center items-center space-x-2 px-3 py-2 rounded-full text-sm font-medium transition duration-300 transform hover:scale-105">
+                    <button onClick={() =>userData? navigate('/upload-prescription'):toast.info("Please login to proceed")} className="bg-[#14967F] w-full lg:w-52 h-10 text-white text-center flex justify-center items-center space-x-2 px-3 py-2 rounded-full text-sm font-medium transition duration-300 transform hover:scale-105">
                         <img src={uploadIcon} alt="Upload Icon" />
-                        <button className='text-center' onClick={() =>userData?navigate('/upload-prescription'):toast.info("Please login to proceed")}>Upload Prescription</button>
+                        <div className='text-center' >Upload Prescription</div>
                     </button>
                 </div>
             </nav>

@@ -23,10 +23,10 @@ const Footer = () => {
           <h2 className="text-xl font-bold mb-2 text-[40px]">MAYA </h2>
           <h2 className="text-xl font-bold mb-2  text-[40px]"> ENTERPRISE</h2>
           <div className="flex space-x-4 text-2xl pt-4">
-            <FaFacebookF className="cursor-pointer hover:text-gray-300" />
-            <FaYoutube className="cursor-pointer hover:text-gray-300" />
-            <FaLinkedinIn className="cursor-pointer hover:text-gray-300" />
-            <FaTwitter className="cursor-pointer hover:text-gray-300" />
+            <FaFacebookF className="cursor-pointer hover:text-gray-300 text-[15px]"  />
+            <FaYoutube className="cursor-pointer hover:text-gray-300 text-[15px]"  />
+            <FaLinkedinIn className="cursor-pointer hover:text-gray-300 text-[15px]" />
+            <FaTwitter className="cursor-pointer hover:text-gray-300 text-[15px]"  />
           </div>
         </div>
         <div className="mb-6 lg:mb-0 lg:w-1/3 lg:px-12 text-center lg:text-left">
@@ -71,7 +71,8 @@ const Footer = () => {
           </div>
         </div>
         </div>
-      <div className="text-center border-t border-gray-700 py-4">
+      <div className="text-center border-t border-[#F1F9FF]
+ py-4">
         <p>Copyright @sdlcCorp 2024</p>
       </div>
         </div>

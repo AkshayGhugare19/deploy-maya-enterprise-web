@@ -97,20 +97,21 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
     return <div>
         <div className="text-2xl font-bold my-4">Order List {stepperProgressCartData?.cartData?.length} items</div>
         <div className="lg:flex gap-5">
-            <div className="lg:w-1/2 flex flex-col">
-                {stepperProgressCartData.cartData && stepperProgressCartData?.cartData?.length !== 0 && stepperProgressCartData?.cartData.map((item) => (
-                    <ProductCardofCart
-                        key={item._id}
-                        item={item}
-                        onDelete={() => handleRemoveCartItem(item._id)}
-                        // onQuantityChange={(type) => handleQuantityChange(type, item?._id, item?.quantity, item?.productDetails?.productQuantity)}
-                        stepperProgressCartData={setStepperProgressCartData}
-                        setStepperProgressCartData={setStepperProgressCartData}
-                    />
-                ))}
-                <ButtonWithLoader loading={loading} buttonText={"Proceed to payment"} onClick={setOrderSummary} width={"w-[200px]"} />
+            <div className="lg:w-1/2 min-w-[300px] flex flex-col gap-y-3">
+                <div className="max-h-[380px] overflow-y-auto scrollbar-custom scroll-smooth">
+                    {stepperProgressCartData.cartData && stepperProgressCartData?.cartData?.length !== 0 && stepperProgressCartData?.cartData.map((item) => (
+                        <ProductCardofCart
+                            key={item._id}
+                            item={item}
+                            onDelete={() => handleRemoveCartItem(item._id)}
+                            // onQuantityChange={(type) => handleQuantityChange(type, item?._id, item?.quantity, item?.productDetails?.productQuantity)}
+                            stepperProgressCartData={setStepperProgressCartData}
+                            setStepperProgressCartData={setStepperProgressCartData}
+                        />
+                    ))}
+                </div>
 
-                {/* <button className="bg-[#14967F] font-[600] text-[#FFFFFF] w-[200px] rounded-[30px] p-2 self-end	" onClick={setOrderSummary}>Proceed to Payment</button> */}
+                <ButtonWithLoader loading={loading} buttonText={"Proceed to payment"} onClick={setOrderSummary} width={"w-[200px]"} />
             </div>
             <div className="flex flex-col lg:w-1/2">
                 <PaymentSummary type="summary" item={stepperProgressCartData ? stepperProgressCartData : []} />

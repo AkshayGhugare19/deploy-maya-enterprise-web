@@ -129,7 +129,7 @@ const Signup = () => {
         } else {
           Toast.fire({
             title: "Error!",
-            text: response.data?.message || "Something went wrong!",
+            text: response.data?.data || "Something went wrong!",
             icon: "error",
           });
         }

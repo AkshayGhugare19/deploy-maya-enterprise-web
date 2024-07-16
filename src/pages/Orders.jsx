@@ -19,17 +19,23 @@ const Orders = () => {
 
     const getUserOrder = async () => {
         setLoading(true);
-        const response = await apiGET(`${API_URL}/v1/order/get-user-orders/${userId}`);
-        const sortedData = response?.data?.data?.sort((a, b) => new Date(b?.createdAt) - new Date(a?.createdAt));
-        setOrderData(sortedData);
+        try {
+            const response = await apiGET(`${API_URL}/v1/order/get-user-orders/${userId}`);
+            if (response.status) {
+                const sortedData = response?.data?.data?.sort((a, b) => new Date(b?.createdAt) - new Date(a?.createdAt));
+                setOrderData(sortedData);
+            }
+        } catch (error) {
+            console.log("Error fetching user orders", error);
+        }
         setLoading(false);
     };
 
     useEffect(() => {
         getUserOrder();
     }, [userId]);
-    useEffect(()=>{
-       scrollToTop(); 
+    useEffect(() => {
+        scrollToTop();
     })
     const handlePageClick = ({ selected }) => {
         setCurrentPage(selected);
@@ -83,8 +89,8 @@ const Orders = () => {
                                         <tr key={item.id} className="hover:bg-[#ccecee]">
                                             <td className="py-2 px-2 border-b">{item?._id || "--"}</td>
                                             <td className="py-2 px-2 border-b">{item?.mode || "--"}</td>
-                                            <td className="py-2 px-2 border-b">{item?.orderType?item?.orderType:"--"}</td>
-                                            <td className="py-2 px-2 border-b">{item?.status?item?.status:"--"}</td>
+                                            <td className="py-2 px-2 border-b">{item?.orderType ? item?.orderType : "--"}</td>
+                                            <td className="py-2 px-2 border-b">{item?.status ? item?.status : "--"}</td>
                                             <td className="py-2 px-2 border-b">
                                                 {moment(item?.createdAt || "09/07/24").format("DD/MM/YY")}
                                             </td>

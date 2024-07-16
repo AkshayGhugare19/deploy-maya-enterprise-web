@@ -11,6 +11,7 @@ import starblank from '../../assest/image/starblue.svg';
 import shopping from '../../assest/image/shopping.svg';
 import renderStars from '../../utilities/renderProductStars';
 import { apiGET } from '../../utilities/apiHelpers';
+import { API_URL } from '../../config';
 
 const Topratecomponet = () => {
   const [categories, setCategories] = useState([]);
@@ -19,7 +20,7 @@ const Topratecomponet = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiGET('http://localhost:3001/v1/product/getProductsBasedOnCategories');
+        const response = await apiGET(`${API_URL}/v1/product/getProductsBasedOnCategories`);
         if (response.data.status) {
           setCategories(response.data.data);
         }

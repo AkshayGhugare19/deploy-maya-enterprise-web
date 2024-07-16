@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import SortByAlphabet from '../components/SortByAlphabet/SortByAlphabet';
 import Pagination from '../components/Pagination/Pagination';
-import { apiPOST } from '../utilities/apiHelpers';
+import { apiGET, apiPOST } from '../utilities/apiHelpers';
 import { toast } from 'react-toastify';
 import 'tailwindcss/tailwind.css';
 import KidneyMedicinesCard from '../components/kidneyMedicines/KidneyMedicinesCard';
 import scrollToTop from '../utilities/scrollToTop';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCartCount } from '../redux/users/users';
 
 const Products = () => {
     const [products, setProducts] = useState([]);
@@ -17,6 +19,20 @@ const Products = () => {
     });
     const [selectedLetter, setSelectedLetter] = useState('');
     const [loading, setLoading] = useState(false);
+    const [stepperProgressCartData, setStepperProgressCartData] = useState([]);
+    const userId = useSelector((state) => state.user?.userData?.id) || '';
+    const dispatch = useDispatch()
+    const getUserStepperProgress = async () => {
+        if (userId) {
+            try {
+                const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
+                setStepperProgressCartData(stepperResponse.data?.data);
+                dispatch(setCartCount(stepperResponse.data?.data?.cartData.length));
+            } catch (error) {
+                console.log("Error fetching cart details", error);
+            }
+        }
+    }
 
     const fetchProducts = async (sortIndex = '', page = 1) => {
         setLoading(true);
@@ -48,12 +64,13 @@ const Products = () => {
     };
 
     useEffect(() => {
-        fetchProducts(selectedLetter); // Fetch products for the default selected letter 'A' on mount
-    }, [selectedLetter]); // Empty dependency array ensures this runs only once
+        fetchProducts(selectedLetter);
+        getUserStepperProgress()
+    }, [selectedLetter]);
 
     const handleLetterClick = (letter) => {
         setSelectedLetter(letter);
-        fetchProducts(letter, 1); // Fetch products for the selected letter and reset to page 1
+        fetchProducts(letter, 1);
     };
 
     const handlePageChange = (page) => {
@@ -81,7 +98,7 @@ const Products = () => {
                 <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-1'>
                     {products?.length ? (
                         products.map((item) => (
-                            <KidneyMedicinesCard key={item.id} item={item} />
+                            <KidneyMedicinesCard key={item.id} item={item} stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />
                         ))
                     ) : (
                         <div className='col-span-full flex justify-center items-center'>

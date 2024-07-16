@@ -10,7 +10,7 @@ const AttachedPrescription = ({ stepperProgressCartData }) => {
                 Attached prescription
             </label>
             <div className='flex justify-center items-center'>
-                <img className="w-full h-auto max-w-xs md:max-w-md lg:max-w-lg" src={stepperProgressCartData?.selectedPrescription[0]?.prescriptionImgUrl ? stepperProgressCartData?.selectedPrescription[0]?.prescriptionImgUrl : ""} />
+                <img className="w-full h-auto max-w-xs md:max-w-md lg:max-w-lg" src={(stepperProgressCartData?.selectedPrescription && stepperProgressCartData?.selectedPrescription[0]?.prescriptionImgUrl) ? stepperProgressCartData?.selectedPrescription[0]?.prescriptionImgUrl : ""} />
             </div>
         </div>
     );

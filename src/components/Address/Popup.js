@@ -2,16 +2,20 @@ import React, { useState, useEffect, useRef } from "react";
 import { apiPOST } from "../../utilities/apiHelpers";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { Country, State, City } from 'country-state-city';
 export default function Popup({ isOpen, setIsOpen, onUpdate }) {
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  const [selectedCountry, setSelectedCountry] = useState({ isoCode: '', name: '' });
+  const [selectedState, setSelectedState] = useState({ isoCode: '', name: '' });
+  const [selectedCity, setSelectedCity] = useState('');
   const [addressFormData, setAddressFormData] = useState({
     Name: '',
     addressLine1: '',
     addressLine2: '',
-    zip: '',
-    country: '',
-    city: '',
-    state: ''
+    zip: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -35,6 +39,42 @@ export default function Popup({ isOpen, setIsOpen, onUpdate }) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen, setIsOpen]);
+
+  useEffect(() => {
+    setCountries(Country.getAllCountries());
+  }, []);
+
+  useEffect(() => {
+    if (selectedCountry.isoCode) {
+      const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
+      setStates(countryStates);
+      setSelectedState({ isoCode: '', name: '' });
+      setCities([]);
+      setSelectedCity('');
+    }
+  }, [selectedCountry]);
+
+  useEffect(() => {
+    if (selectedState.isoCode) {
+      const stateCities = City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode);
+      setCities(stateCities);
+      setSelectedCity('');
+    }
+  }, [selectedState, selectedCountry]);
+
+  const handleCountryChange = (e) => {
+    const selectedOption = countries.find(country => country.isoCode === e.target.value);
+    setSelectedCountry({ isoCode: selectedOption.isoCode, name: selectedOption.name });
+  };
+
+  const handleStateChange = (e) => {
+    const selectedOption = states.find(state => state.isoCode === e.target.value);
+    setSelectedState({ isoCode: selectedOption.isoCode, name: selectedOption.name });
+  };
+
+  const handleCityChange = (e) => {
+    setSelectedCity(e.target.value);
+  };
 
   const togglePopup = () => {
     setIsOpen(!isOpen);
@@ -77,19 +117,19 @@ export default function Popup({ isOpen, setIsOpen, onUpdate }) {
       newErrors.zip = "Pincode should be exactly 6 digits";
     }
 
-    if (!addressFormData.country.trim()) {
+    if (!selectedCountry.name.trim()) {
       newErrors.country = "Country is required";
     } else if (!alphaRegex.test(addressFormData.country)) {
       newErrors.country = "Country should contain only alphabets";
     }
 
-    if (!addressFormData.city.trim()) {
+    if (!selectedCity.trim()) {
       newErrors.city = "City is required";
     } else if (!alphaRegex.test(addressFormData.city)) {
       newErrors.city = "City should contain only alphabets";
     }
 
-    if (!addressFormData.state.trim()) {
+    if (!selectedState.name.trim()) {
       newErrors.state = "State is required";
     } else if (!alphaRegex.test(addressFormData.state)) {
       newErrors.state = "State should contain only alphabets";
@@ -105,20 +145,25 @@ export default function Popup({ isOpen, setIsOpen, onUpdate }) {
       setErrors(formErrors);
       return;
     }
-
+    const addAddressPayload = {
+      ...addressFormData,
+      country: selectedCountry.name,
+      city: selectedCity,
+      state: selectedState.name
+    }
     try {
-      const response = await apiPOST('/v1/address/add-address', addressFormData);
+      const response = await apiPOST('/v1/address/add-address', addAddressPayload);
       if (response.status) {
         // Clear the form data
         setAddressFormData({
           Name: '',
           addressLine1: '',
           addressLine2: '',
-          zip: '',
-          country: '',
-          city: '',
-          state: ''
+          zip: ''
         });
+        setSelectedCountry({ isoCode: '', name: '' });
+        setSelectedState({ isoCode: '', name: '' })
+        setSelectedCity('')
         setErrors({});
         togglePopup();
         // onUpdate();
@@ -147,6 +192,7 @@ export default function Popup({ isOpen, setIsOpen, onUpdate }) {
             </button>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+
               <h1 className="text-xl font-bold mb-4">Add New Address</h1>
               <div className="flex space-x-4">
                 <div className="flex-1">
@@ -199,42 +245,48 @@ export default function Popup({ isOpen, setIsOpen, onUpdate }) {
                 </div>
                 <div className="flex-1">
                   <label className="block text-gray-700">Country</label>
-                  <input
-                    type="text"
-                    name="country"
-                    value={addressFormData.country}
-                    onChange={handleChange}
-                    placeholder="Country"
+                  <select value={selectedCountry.isoCode} onChange={handleCountryChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded"
-                  />
+                  >
+                    <option value="">Select Country</option>
+                    {countries.map(country => (
+                      <option key={country.isoCode} value={country.isoCode}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
                   {errors.country && <span className="text-xs text-red-500">{errors.country}</span>}
                 </div>
               </div>
 
               <div className="flex space-x-4">
                 <div className="flex-1">
-                  <label className="block text-gray-700">City</label>
-                  <input
-                    type="text"
-                    name="city"
-                    value={addressFormData.city}
-                    onChange={handleChange}
-                    placeholder="City"
+                  <label className="block text-gray-700">State</label>
+                  <select value={selectedState.isoCode} onChange={handleStateChange} disabled={!selectedCountry.isoCode}
                     className="w-full px-3 py-2 border border-gray-300 rounded"
-                  />
-                  {errors.city && <span className="text-xs text-red-500">{errors.city}</span>}
+                  >
+                    <option value="">Select State</option>
+                    {states.map(state => (
+                      <option key={state.isoCode} value={state.isoCode}>
+                        {state.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.state && <span className="text-xs text-red-500">{errors.state}</span>}
                 </div>
                 <div className="flex-1">
-                  <label className="block text-gray-700">State</label>
-                  <input
-                    type="text"
-                    name="state"
-                    value={addressFormData.state}
-                    onChange={handleChange}
-                    placeholder="State"
+                  <label className="block text-gray-700">City</label>
+                  <select value={selectedCity} onChange={handleCityChange} disabled={!selectedState.isoCode}
                     className="w-full px-3 py-2 border border-gray-300 rounded"
-                  />
-                  {errors.state && <span className="text-xs text-red-500">{errors.state}</span>}
+                  >
+                    <option value="">Select City</option>
+                    {cities.map(city => (
+                      <option key={city.name} value={city.name}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.city && <span className="text-xs text-red-500">{errors.city}</span>}
                 </div>
               </div>
               <button type="submit" className='rounded-full bg-[#14967F] text-sm text-[#FFFFFF] p-3'>Save & Update</button>

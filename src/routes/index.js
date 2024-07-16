@@ -39,6 +39,7 @@ import Faq from "../pages/Faq";
 import AuthListener from "../utilities/authListener";
 import EnquiryOrderSummary from "../pages/EnquiryOrderSummary";
 import CodSuccessPage from "../pages/CodSuccessPage";
+import EmailSubscribeSuccess from "../pages/EmailSubscribeSuccess";
 
 
 export const publicPages = [
@@ -70,7 +71,8 @@ export const publicPages = [
 	{ path: "/upload-prescription", exact: true, component: UploadPrescription },
 	{ path: "/product/brand/:id", exact: true, component: BrandProducts },
 	{ path: "/enquiries", exact: true, component: Enquiries },
-	{ path: "/order-summary/:id", exact: true, component: EnquiryOrderSummary }
+	{ path: "/order-summary/:id", exact: true, component: EnquiryOrderSummary },
+	{ path: "/email-subscribe/:id", exact: true, component: EmailSubscribeSuccess }
 
 
 ];

@@ -99,7 +99,7 @@ const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData }) => 
             {/* {JSON.stringify(stepperProgressCartData.cartData)} */}
             <div className="text-2xl font-bold my-4">{stepperProgressCartData?.cartData?.length} items added in Cart</div>
             <div className="lg:flex gap-5">
-                <div className="lg:w-1/2 min-w-[300px] max-h-[500px] overflow-y-auto scrollbar-custom scroll-smooth">
+                <div className="lg:w-1/2 min-w-[300px] max-h-[380px] overflow-y-auto scrollbar-custom scroll-smooth">
                     {stepperProgressCartData.cartData && stepperProgressCartData?.cartData?.length !== 0 && stepperProgressCartData?.cartData.map((item) => (
                         <ProductCardofCart
                             key={item._id}

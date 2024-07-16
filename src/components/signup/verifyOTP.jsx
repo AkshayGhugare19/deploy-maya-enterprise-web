@@ -88,7 +88,7 @@ const VerifyOTP = () => {
         } else {
           Toast.fire({
             title: "Error!",
-            text: response.data?.message || "Something went wrong!",
+            text: response.data?.data || "Something went wrong!",
             icon: "error",
           });
         }
@@ -107,6 +107,43 @@ const VerifyOTP = () => {
       }
     }
   };
+
+  const resendOtp = async () => {
+    try {
+      let payload = {
+        email: formData.email,
+      };
+      const response = await apiPOST("v1/auth/resend-otp", payload);
+      console.log("response", response);
+      if (response.status === 200) {
+        Toast.fire({
+          title: "Success!",
+          text: response?.data?.data ||
+            response.message ||
+            "An unexpected error occurred",
+          icon: "success",
+        })
+      } else {
+        Toast.fire({
+          title: "Error!",
+          text: response.data?.data || "Something went wrong!",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      console.log("error", error);
+      Toast.fire({
+        title: "Error",
+        text:
+          error.response?.data?.message ||
+          error.message ||
+          "An unexpected error occurred",
+        icon: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="flex max-w-4xl md:mx-auto mt-10 border rounded-lg overflow-hidden shadow-lg mx-5">
@@ -158,12 +195,12 @@ const VerifyOTP = () => {
               <div className="text-red-500 text-sm mb-4">{errors}</div>
             )}
             <div className="text-center mb-24">
-              <Link
-                to="#"
+              <button
+                onClick={resendOtp}
                 className="text-[#14967F] text-sm font-semibold no-underline"
               >
                 Resend OTP?
-              </Link>
+              </button>
             </div>
           </div>
           <button

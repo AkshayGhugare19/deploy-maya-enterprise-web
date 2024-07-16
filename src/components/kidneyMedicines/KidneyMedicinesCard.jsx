@@ -177,6 +177,7 @@ const KidneyMedicinesCard = ({ item, stepperProgressCartData, setStepperProgress
                   <div className="w-full flex items-center justify-between mt-4 bg-gray-200 rounded-full">
                     {decrementLoader ? <SimpleLoader /> : <button
                       className="bg-[#14967F] text-white rounded-full w-[58px] h-full py-2 flex items-center justify-center focus:outline-none"
+                      disabled={decrementLoader}
                       onClick={() => handleDecrement(item?._id)}
                     >
                       -
@@ -184,6 +185,7 @@ const KidneyMedicinesCard = ({ item, stepperProgressCartData, setStepperProgress
                     <span className="mx-4 text-lg">{fetchCartQuantity(item?._id)}</span>
                     {incrementLoader ? <SimpleLoader /> : <button
                       className="bg-[#14967F] text-white rounded-full w-[58px] h-full py-2 flex items-center justify-center focus:outline-none"
+                      disabled={incrementLoader}
                       onClick={() => handleIncrement(item?._id, item?.productQuantity)}
                     >
                       +

@@ -36,21 +36,34 @@ const Navbar = () => {
     }
   };
 
+  // const navigateToViewCart = async () => {
+  //   try {
+  //     if (!userData?.id) {
+  //       toast.info('Please login to proceed')
+  //     }
+  //     // const response = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userData.id}`)
+  //     if (!cartCount) {
+  //       toast.error('Cart is Empty')
+  //     } else {
+  //       navigate('/view-cart')
+  //     }
+  //   } catch (error) {
+  //     toast.error('Error Fetching Stepper Info')
+  //   }
+  // }
   const navigateToViewCart = async () => {
     try {
       if (!userData?.id) {
-        toast.info('Please login to proceed')
-      }
-      // const response = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userData.id}`)
-      if (!cartCount) {
-        toast.error('Cart is Empty')
+        toast.info('Please login to proceed');
+      } else if (userData?.id && !cartCount) {
+        toast.error('Cart is Empty');
       } else {
-        navigate('/view-cart')
+        navigate('/view-cart');
       }
     } catch (error) {
-      toast.error('Error Fetching Stepper Info')
+      toast.error('Error Fetching Stepper Info');
     }
-  }
+  };
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);

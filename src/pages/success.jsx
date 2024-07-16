@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { BiArrowBack } from 'react-icons/bi';
-import { apiGET } from '../utilities/apiHelpers';
+import { apiGET, apiPOST, apiPUT } from '../utilities/apiHelpers';
 import { useDispatch, useSelector } from 'react-redux';
 import { apiDELETE } from '../utilities/apiHelpers';
 import { resetUserCartData } from '../redux/carts/carts';
 import { toast } from 'react-toastify';
+import { setCartCount } from '../redux/users/users';
+import { API_URL } from '../config';
 
 
 const PaymentSuccess = () => {
@@ -15,6 +17,7 @@ const PaymentSuccess = () => {
   const hasFetched = useRef(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
+  console.log("QData",data)
   const userId = useSelector((state) => state.user.userData.id) || ''
   const getSessionInfo = async (sessionId) => {
     try {
@@ -22,7 +25,8 @@ const PaymentSuccess = () => {
       const response = await apiGET(`/v1/payment/get-session-info/${sessionId}`);
       if (response.status === 200) {
         setData(response.data.data);
-        console.log("session data", response.data.data);
+        console.log("session data", response?.data?.data);
+        handlePaymentHistory(response?.data?.data)
       }
     } catch (error) {
       console.error('Error fetching session info: ', error);
@@ -35,9 +39,26 @@ const PaymentSuccess = () => {
   const deleteUserStepperProgress = async () => {
     try {
       setLoading(true);
-      const response = await apiDELETE(`/v1/stepper-progress/delete-stepper-progressByUserId/${userId}`);
+      const payload = {
+        selectedAddress: null,
+        selectedPrescription: null,
+        cartData: [],
+        currentStep: 0
+      }
+      const response = await apiPUT(`/v1/stepper-progress/update-stepper-progress/${userId}`, payload);
       if (response.status === 200) {
-        dispatch(resetUserCartData())
+        try {
+          const response = await apiDELETE(`/v1/cart/remove-user-cart`);
+          if (response.status) {
+            console.log(response.data.data);
+            dispatch(setCartCount(0))
+          } else {
+            console.log(response.data);
+          }
+        } catch (error) {
+          // return rejectWithValue(error.response.data);
+          toast.error('Error Removing Cart')
+        }
         console.log("Delete response", response.data.data);
       }
     } catch (error) {
@@ -45,6 +66,33 @@ const PaymentSuccess = () => {
       toast.error('Error fetching session info');
     } finally {
       setLoading(false);
+    }
+  }
+
+  const handlePaymentHistory = async(data)=>{
+    console.log('Payment History???', data);
+    try {
+      const params = new URLSearchParams(location.search);
+      const session_id = params.get('session_id');
+      console.log("History required",userId,session_id);
+      const paymentHistoryPayload = {
+          "userId": userId ,
+          "amount": 233,
+          "status": data?.status,
+          "currency": data?.currency,
+          "paymentId": data?.id,
+          "session_id":session_id,
+          "receipt_email": data?.receipt_email,
+          "payment_method_types": data?.payment_method_types[0]
+      }
+      const historyResponse = await apiPOST(`${API_URL}/v1/payment-history/add`,paymentHistoryPayload)
+      if(historyResponse?.data?.status){
+        console.log("payment history add success")
+      }else{
+        console.log("payment history add error")
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 

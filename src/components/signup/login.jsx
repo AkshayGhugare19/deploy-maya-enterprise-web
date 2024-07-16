@@ -106,10 +106,13 @@ function Login() {
           localStorage.setItem("refreshToken", response?.data?.data?.tokens?.refresh?.token);
           navigate("/");
         } else {
-          toast.error(response?.data?.data || "Invalid credentials");
+          console.log("response?.data?.data", response?.data?.data);
+          toast.error(response?.data?.data?.msg || response?.data?.data || "Invalid credentials");
+          navigate("/VerifyOTP", { state: formData });
         }
       } catch (error) {
-        toast.error(error.response?.data?.message || error.message || "An unexpected error occurred");
+        console.log("error", error?.data?.msg);
+        toast.error(error?.data?.msg || error.message || "An unexpected error occurred");
       } finally {
         setLoading(false);
       }

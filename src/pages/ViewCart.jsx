@@ -9,8 +9,9 @@ import { fetchGlobalConfig } from "../redux/globalconfig/globalconfig";
 import { useDispatch, useSelector } from "react-redux";
 import { resetStateForEnquiry, updateStep } from "../redux/carts/carts";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { apiGET, apiPOST } from "../utilities/apiHelpers";
+import { apiGET, apiPOST, apiPUT } from "../utilities/apiHelpers";
 import { API_URL } from "../config";
+import scrollToTop from "../utilities/scrollToTop";
 
 const ViewCart = () => {
     const dispatch = useDispatch();
@@ -33,9 +34,15 @@ const ViewCart = () => {
         }
     };
 
-    const goToPrevStep = () => {
+    const goToPrevStep = async () => {
         if (stepperProgressCartData?.currentStep > 0) {
-            dispatch(updateStep(currentStep - 1))
+            const payload = {
+                currentStep: stepperProgressCartData?.currentStep - 1
+            }
+            // dispatch(updateStep(currentStep - 1))
+            const response = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, payload);
+            console.log(response.data.data);
+            setStepperProgressCartData(response?.data?.data);
         }
     };
 
@@ -77,6 +84,7 @@ const ViewCart = () => {
     }
 
     useEffect(() => {
+        scrollToTop()
         dispatch(fetchGlobalConfig())
         getUserStepperProgress();
         console.log(stepperProgressCartData?.currentStep);
@@ -88,14 +96,14 @@ const ViewCart = () => {
     return <div className="container mx-auto p-4">
         <MyCartStepper steps={steps} currentStep={stepperProgressCartData?.currentStep} />
         {
-            stepperProgressCartData?.currentStep > 0 && orderMode != 'enquiry' && <button
+            stepperProgressCartData?.currentStep > 0 && <button
                 onClick={goToPrevStep}
                 className="flex items-center justify-start gap-2 mt-2">
                 <FaArrowLeftLong />Back to {steps[stepperProgressCartData?.currentStep - 1]}
             </button>
         }
         {renderStepComponent(stepperProgressCartData?.currentStep)}
-    </div>
+    </div >
 }
 
 export default ViewCart;

@@ -15,15 +15,17 @@ const AddressStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
     const [isOpen, setIsOpen] = useState(false);
     const [selectedAddress, setSelectedAddress] = useState(null);
     const userId = useSelector((state) => state.user?.userData?.id) || "";
-    const addresses = useSelector((state) => state.user?.address) || [];
+    // const addresses = useSelector((state) => state.user?.address) || [];
+    const [addresses, setAddress] = useState([]);
     const dispatch = useDispatch()
-    const [loading,setLoading] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const getUserAddresses = async () => {
         const response = await apiGET(`/v1/address/getAddress/${userId}`)
         if (response.status) {
-            console.log(response.data.data);
-            dispatch(setAddress(response.data.data));
+            console.log(response.data?.data);
+            // dispatch(setAddress(response.data.data));
+            setAddress(response.data?.data)
         } else {
             console.error("Failed to fetch cart data", response);
         }
@@ -86,12 +88,12 @@ const AddressStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                     ))}
                 </div>
                 <div className='flex gap-2'>
-                <button onClick={() => setIsOpen(!isOpen)} className="mt-4 py-2 px-4 bg-[#F1F9FF] text-[#14967F] rounded-[30px]">
-                    + Add New Address
-                </button>
-                <ButtonWithLoader loading={loading} buttonText={"Submit"} onClick={setSelectedAddressFunc} width={"w-[100px]"}/>
+                    <button onClick={() => setIsOpen(!isOpen)} className="mt-4 py-2 px-4 bg-[#F1F9FF] text-[#14967F] rounded-[30px]">
+                        + Add New Address
+                    </button>
+                    <ButtonWithLoader loading={loading} buttonText={"Submit"} onClick={setSelectedAddressFunc} width={"w-[100px]"} />
 
-                {/* <button onClick={setSelectedAddressFunc} className="mt-6 py-2 px-6 bg-[#14967F] text-white rounded-[30px] self-center lg:self-start">
+                    {/* <button onClick={setSelectedAddressFunc} className="mt-6 py-2 px-6 bg-[#14967F] text-white rounded-[30px] self-center lg:self-start">
                     Submit
                 </button> */}
                 </div>
