@@ -81,6 +81,22 @@ const UploadPrescriptionStep = ({ type, setCurrentStep, stepperProgressCartData,
         // }
         else {
             console.log("Inside else", selectedImageUrl);
+            const updateStepperProgressPayload = {
+                currentStep: 2
+            }
+            // dispatch(updateSelectedPrescription(selectedImageUrl))
+            try {
+                const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
+                console.log("userStepperAddResponse", userStepperAddResponse);
+                if (userStepperAddResponse.status) {
+                    const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
+                    setStepperProgressCartData(stepperResponse.data?.data);
+                    setLoading(false)
+                }
+            } catch (error) {
+                console.log("Error updating seleted prescription", error);
+                setLoading(false)
+            }
             //for stepper to update if image not selected
             dispatch(updateStep(2));
         }
@@ -95,7 +111,7 @@ const UploadPrescriptionStep = ({ type, setCurrentStep, stepperProgressCartData,
             }
             const prescriptionResponse = await apiPOST(`${API_URL}/v1/prescription/add-prescription-img`, prescriptionPayload);
             if (prescriptionResponse) {
-                toast.success("Prescription Added successfully!");
+                toast.success("Prescription Uploaded successfully!");
                 setUploadStatus('File uploaded successfully!');
                 console.log("prescriptionResponse", prescriptionResponse.data.data.data);
                 if (type === "uploadPrescription") {

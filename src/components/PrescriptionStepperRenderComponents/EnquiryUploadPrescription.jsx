@@ -10,6 +10,7 @@ import FileUploadInput from "../Input/FileUploadInput";
 import { toast } from "react-toastify";
 import ShowSelectedPrescription from "../presecription/ShowSelectedPrescription";
 import scrollToTop from "../../utilities/scrollToTop";
+import ButtonWithLoader from "../Button/ButtonWithLoader";
 
 const EnquiryUploadPrescription = ({ type, setCurrentStep, stepperProgressCartData, setStepperProgressCartData }) => {
     const dispatch = useDispatch()
@@ -18,6 +19,7 @@ const EnquiryUploadPrescription = ({ type, setCurrentStep, stepperProgressCartDa
     const [selectedImageUrl, setSelectedImageUrl] = useState([]);
     const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
     const [uploadStatus, setUploadStatus] = useState('');
+    const [loading, setLoading] = useState(false);
     const userId = useSelector((state) => state.user?.userData?.id) || ""
     const loggedInUserCartData = useSelector((state) => state.cart.cartData) || []
 
@@ -48,6 +50,7 @@ const EnquiryUploadPrescription = ({ type, setCurrentStep, stepperProgressCartDa
             console.log("selectedImageUrl", selectedImageUrl);
             // dispatch(updateSelectedPrescription(selectedImageUrl))
             try {
+                setLoading(true)
                 const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
                 console.log("userStepperAddResponse", userStepperAddResponse);
                 if (userStepperAddResponse.status) {
@@ -55,14 +58,13 @@ const EnquiryUploadPrescription = ({ type, setCurrentStep, stepperProgressCartDa
                     setStepperProgressCartData(stepperResponse.data?.data);
                 }
             } catch (error) {
+                setLoading(false)
                 console.log("Error updating seleted prescription", error);
             }
             if (type == 'uploadPrescription') {
                 setCurrentStep();
             }
-            else {
-                toast.error("Upload or Select Prescription to proceed")
-            }
+
         }
         // if (type === 'cart' && selectedImageUrl.length) {
         //     console.log("selectedImageUrl", selectedImageUrl);
@@ -72,9 +74,8 @@ const EnquiryUploadPrescription = ({ type, setCurrentStep, stepperProgressCartDa
         //     setCurrentStep();
         // }
         else {
-            console.log("Inside else", selectedImageUrl);
-            //for stepper to update if image not selected
-            dispatch(updateStep(2));
+            setLoading(false)
+            toast.error("Upload or Select Prescription to proceed")
         }
     }
 
@@ -143,12 +144,13 @@ const EnquiryUploadPrescription = ({ type, setCurrentStep, stepperProgressCartDa
                             setSelectedImageUrl={setSelectedImageUrl} />
                     }
                     <div className="flex justify-end">
-                        <button
+                        {/* <button
                             className="w-[100px] py-2 bg-[#14967F] text-white rounded-[30px] mt-4"
                             onClick={selectedPrescription}
                         >
                             Submit
-                        </button>
+                        </button> */}
+                        <ButtonWithLoader loading={loading} buttonText={"Submit"} onClick={selectedPrescription} width={"w-[100px]"} />
                     </div>
                 </div>
                 <div className="border-l border-gray-300 ml-4 mr-8"></div>

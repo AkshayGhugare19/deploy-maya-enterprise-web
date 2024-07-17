@@ -4,11 +4,14 @@ import { updateSelectedPrescriptionDuration, updateSelectedPrescriptionDurationU
 import { useDispatch, useSelector } from "react-redux";
 import { apiGET, apiPUT } from "../../utilities/apiHelpers";
 import { API_URL } from "../../config";
+import ButtonWithLoader from "../Button/ButtonWithLoader";
+import { toast } from "react-toastify";
 
 const ChooseMedicines = ({ setCurrentStep, stepperProgressCartData }) => {
     const [duration, setDuration] = useState(5);
     const [unit, setUnit] = useState('Days');
     const [selectedOption, setSelectedOption] = useState('asPerPrescription');
+    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const userId = useSelector((state) => state.user?.userData?.id) || ""
     const handleDurationChange = async (e) => {
@@ -52,25 +55,32 @@ const ChooseMedicines = ({ setCurrentStep, stepperProgressCartData }) => {
         dispatch(updateSelectedPrescriptionType(option))
     };
     const handleNextStep = async () => {
-        const updatePayload = {
-            prescriptionType: selectedOption,
-            prescriptionDuration: duration,
-            prescriptionDurationUnit: unit,
+        if (duration <= 0) {
+            toast.error('Invalid Duration')
+        } else {
+            const updatePayload = {
+                prescriptionType: selectedOption,
+                prescriptionDuration: duration,
+                prescriptionDurationUnit: unit,
+            }
+            try {
+                setLoading(true);
+                const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updatePayload);
+                console.log("userStepperAddResponse handleNextStep", userStepperAddResponse);
+                if (userStepperAddResponse.status) {
+                    setLoading(false)
+                    // const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
+                    // setStepperProgressCartData(stepperResponse.data?.data);
+                }
+            } catch (error) {
+                setLoading(false);
+                console.log("Error updating seleted prescription", error);
+            }
+            // dispatch(updateSelectedPrescriptionType(selectedOption))
+            // dispatch(updateSelectedPrescriptionDurationUnit(unit))
+            // dispatch(updateSelectedPrescriptionDuration(duration))
+            setCurrentStep()
         }
-        try {
-            const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updatePayload);
-            console.log("userStepperAddResponse handleNextStep", userStepperAddResponse);
-            // if (userStepperAddResponse.status) {
-            //     const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
-            //     // setStepperProgressCartData(stepperResponse.data?.data);
-            // }
-        } catch (error) {
-            console.log("Error updating seleted prescription", error);
-        }
-        // dispatch(updateSelectedPrescriptionType(selectedOption))
-        // dispatch(updateSelectedPrescriptionDurationUnit(unit))
-        // dispatch(updateSelectedPrescriptionDuration(duration))
-        setCurrentStep()
     };
     return <>
         <div className="p-6 mt-4 bg-white shadow-lg rounded-lg mx-auto">
@@ -100,11 +110,11 @@ const ChooseMedicines = ({ setCurrentStep, stepperProgressCartData }) => {
                                 <select
                                     value={unit}
                                     onChange={handleUnitChange}
-                                    className="p-2 border rounded-[40px] bg-[#095D7E] text-white"
+                                    className="p-2 border rounded-[40px] bg-[#095D7E] text-white cursor-pointer"
                                 >
-                                    <option value="Days">Days</option>
-                                    <option value="Weeks">Weeks</option>
-                                    <option value="Months">Months</option>
+                                    <option value="Days" className="cursor-pointer">Days</option>
+                                    <option value="Weeks" className="cursor-pointer">Weeks</option>
+                                    <option value="Months" className="cursor-pointer">Months</option>
                                 </select>
                             </div>
                         )}
@@ -127,9 +137,10 @@ const ChooseMedicines = ({ setCurrentStep, stepperProgressCartData }) => {
                     <AttachedPrescription type="uploadPrescription" stepperProgressCartData={stepperProgressCartData} />
                 </div>
             </div>
-            <button className="w-[130px] p-2 bg-[#14967F] mt-5 text-white font-semibold rounded-[30px]" onClick={handleNextStep}>
+            {/* <button className="w-[130px] p-2 bg-[#14967F] mt-5 text-white font-semibold rounded-[30px]" onClick={handleNextStep}>
                 Next
-            </button>
+            </button> */}
+            <ButtonWithLoader loading={loading} buttonText={"Next"} onClick={handleNextStep} width={"w-[100px]"} />
         </div>
     </>
 }

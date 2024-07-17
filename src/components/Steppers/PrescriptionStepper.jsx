@@ -3,11 +3,11 @@ import React from 'react';
 
 
 
-const PrescriptionStepper = ({ currentStep, steps }) => {
+const PrescriptionStepper = ({ currentStep, steps, setCurrentStep, stepperNavigation }) => {
     return (
         <div className="w-full lg:w-64 p-4 bg-[#FFFFFF] shadow-lg rounded-[16px]">
             {steps.map((step, index) => (
-                <div key={step.id} className="relative flex mb-6">
+                <div key={step.id} className="relative flex mb-6 cursor-pointer" onClick={() => stepperNavigation(step.id)}>
                     <div className="relative flex-shrink-0 w-4 h-4 mt-2">
                         <div className={`w-full h-full rounded-full border-2 ${currentStep >= step.id ? 'border-[#14967F] bg-[#14967F]' : 'border-gray-300 bg-white'}`} />
                         {currentStep >= step.id && (

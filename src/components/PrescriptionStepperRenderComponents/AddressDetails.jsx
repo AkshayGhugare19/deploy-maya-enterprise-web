@@ -9,6 +9,7 @@ import { updateSelectedAddress } from "../../redux/carts/carts";
 import { toast } from "react-toastify";
 import Popup from "../Address/Popup";
 import { useNavigate } from "react-router-dom";
+import ButtonWithLoader from "../Button/ButtonWithLoader";
 
 const AddressDetails = ({ stepperProgressCartData }) => {
     const [duration, setDuration] = useState(5);
@@ -16,6 +17,7 @@ const AddressDetails = ({ stepperProgressCartData }) => {
     const [unit, setUnit] = useState('Days');
     const [selectedOption, setSelectedOption] = useState('order');
     const [selectedAddress, setSelectedAddress] = useState(null);
+    const [loading, setLoading] = useState(false);
     const userId = useSelector((state) => state.user?.userData?.id) || "";
     const addresses = useSelector((state) => state.user?.address) || [];
     const selectedPrescription = useSelector((state) => state.cart?.selectedPrescription[0]) || {};
@@ -43,7 +45,7 @@ const AddressDetails = ({ stepperProgressCartData }) => {
     }
 
     const setSelectedAddressFunc = async () => {
-        if (stepperProgressCartData?.selectedPrescription[0]?._id) {
+        if (selectedAddress && selectedAddress?._id) {
             // const updatePrescriptionPayload = {
             //     type: stepperProgressCartData?.prescriptionType || 'order',
             //     durationUnit: stepperProgressCartData?.prescriptionDurationUnit,
@@ -70,6 +72,7 @@ const AddressDetails = ({ stepperProgressCartData }) => {
                 addressId: selectedAddress._id
             }
             try {
+                setLoading(true);
                 const addOrderResponse = await apiPOST(`/v1/order/add`, addOrderPayload);
                 if (addOrderResponse.status) {
                     console.log('addOrderResponse::', addOrderResponse)
@@ -80,20 +83,24 @@ const AddressDetails = ({ stepperProgressCartData }) => {
                         }
                         const response = await apiPUT(`/v1/stepper-progress/update-stepper-progress/${userId}`, updatePayload);
                         if (response.status) {
+                            setLoading(false);
                             navigate('/enquiries')
                         }
                     } catch (error) {
+                        setLoading(false)
                         toast.error("Error Deleting progress")
                     }
                 } else {
+                    setLoading(false)
                     toast.error('Error Adding Order');
                 }
             } catch (error) {
+                setLoading(false)
                 console.log('Error Placing order::', error)
             }
             // }
         } else {
-            toast.error("Please select address")
+            toast.error("Please select address to proceed")
         }
     }
 
@@ -108,24 +115,29 @@ const AddressDetails = ({ stepperProgressCartData }) => {
         <h2 className="text-md font-semibold mb-4">Select from saved address</h2>
         <div className="flex lg:flex-row gap-4 flex-col justify-between">
             <div className="mb-4 w-full">
-                {addresses?.map((address) => (
-                    <div key={address._id} className={`flex items-center bg-[#F8F8F8] p-4 mb-4 rounded-lg shadow-md cursor-pointer ${selectedAddress?._id === address._id ? 'border-2 border-blue-500 transform scale-105' : ''
-                        }`}
-                        onClick={() => handleSelect(address)}>
-                        <div className="text-2xl mr-3"><MdOutlineLocationOn /></div>
-                        <div>
-                            <p className="font-bold">{address.zip}</p>
-                            <p>{address.addressLine1}</p>
-                            <p>{address.addressLine2}</p>
+                <div className="max-h-[380px] overflow-y-auto scrollbar-custom scroll-smooth">
+                    {addresses?.map((address) => (
+                        <div key={address._id} className={`flex items-center bg-[#F8F8F8] p-4 mb-4 mx-2 rounded-lg shadow-md cursor-pointer ${selectedAddress?._id === address._id ? 'border-2 border-blue-500' : ''
+                            }`}
+                            onClick={() => handleSelect(address)}>
+                            <div className="text-2xl mr-3"><MdOutlineLocationOn /></div>
+                            <div>
+                                <p className="font-bold">{address.zip}</p>
+                                <p>{address.addressLine1}</p>
+                                <p>{address.addressLine2}</p>
+                            </div>
                         </div>
-                    </div>
-                ))}
-                <button onClick={setSelectedAddressFunc} className="mt-6 py-2 px-6 bg-[#14967F] text-white rounded-[30px] self-center lg:self-start">
+                    ))}
+                </div>
+                {/* <button onClick={setSelectedAddressFunc} className="mt-6 py-2 px-6 bg-[#14967F] text-white rounded-[30px] self-center lg:self-start">
                     Submit
-                </button>
-                <button onClick={() => setIsOpen(!isOpen)} className="mt-4 py-2 px-4 bg-[#F1F9FF] text-[#14967F] rounded-[30px]">
-                    + Add New Address
-                </button>
+                </button> */}
+                <div className="lg:flex gap-4">
+                    <ButtonWithLoader loading={loading} buttonText={"Submit"} onClick={setSelectedAddressFunc} width={"w-[100px]"} />
+                    <button onClick={() => setIsOpen(!isOpen)} className="mt-4 py-2 px-4 bg-[#F1F9FF] text-[#14967F] rounded-[30px]">
+                        + Add New Address
+                    </button>
+                </div>
             </div>
             <div className="lg:w-2/5 lg:border-l-2">
                 <AttachedPrescription type='uploadPrescription' stepperProgressCartData={stepperProgressCartData} />

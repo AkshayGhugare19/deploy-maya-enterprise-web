@@ -14,7 +14,7 @@ const VerifyOTP = () => {
   const [otp, setOtp] = useState(new Array(4).fill(""));
   const [phoneNumber, setPhoneNumber] = useState("");
   const [errors, setErrors] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   const handleChange = (element, index) => {
     const value = element.value;
@@ -74,7 +74,7 @@ const VerifyOTP = () => {
           otp: otp.join(""),
           email: formData.email,
         };
-        setLoading(true);
+        setSubmitLoading(true);
         const response = await apiPOST("v1/auth/verify-otp", payload);
         console.log("response", response);
         if (response.status === 200) {
@@ -103,7 +103,7 @@ const VerifyOTP = () => {
           icon: "error",
         });
       } finally {
-        setLoading(false);
+        setSubmitLoading(false);
       }
     }
   };
@@ -140,13 +140,12 @@ const VerifyOTP = () => {
           "An unexpected error occurred",
         icon: "error",
       });
-    } finally {
-      setLoading(false);
     }
   }
 
   return (
     <div className="flex max-w-4xl md:mx-auto mt-10 border rounded-lg overflow-hidden shadow-lg mx-5">
+      {JSON.stringify(submitLoading)}
       <div
         style={{ backgroundColor: "#F1F9FF" }}
         className="hidden md:block lg:block flex-1 p-10 rounded-xl items-end"
@@ -195,26 +194,26 @@ const VerifyOTP = () => {
               <div className="text-red-500 text-sm mb-4">{errors}</div>
             )}
             <div className="text-center mb-24">
-              <button
+              <a
                 onClick={resendOtp}
-                className="text-[#14967F] text-sm font-semibold no-underline"
+                className="text-[#14967F] text-sm font-semibold no-underline cursor-pointer"
               >
                 Resend OTP?
-              </button>
+              </a>
             </div>
           </div>
           <button
             type="submit"
             className="w-full py-2 text-white font-semibold bg-[#095D7E] rounded-full"
-            disabled={loading}
+            disabled={submitLoading}
           >
-            {loading ? "Verifying..." : "Verify OTP"}
+            {submitLoading ? "Verifying..." : "Verify OTP"}
           </button>
         </form>
         <p className="mt-4 text-xs text-gray-600">
           New on MAYA ENTERPRISE?{" "}
           <Link to="/signup" className="text-[#095D7E] no-underline">
-            Login
+            Sign up
           </Link>
         </p>
       </div>

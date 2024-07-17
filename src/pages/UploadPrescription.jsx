@@ -8,6 +8,7 @@ import { apiGET, apiPOST, apiPUT } from '../utilities/apiHelpers';
 import { API_URL } from '../config';
 import { useSelector } from 'react-redux';
 import EnquiryUploadPrescription from '../components/PrescriptionStepperRenderComponents/EnquiryUploadPrescription';
+import { toast } from 'react-toastify';
 
 const UploadPrescription = () => {
     const [currentStep, setCurrentStep] = useState(1);
@@ -33,7 +34,29 @@ const UploadPrescription = () => {
         } catch (error) {
             console.log("Error updating seleted prescription", error);
         }
-        setCurrentStep(id)
+
+        // setCurrentStep(id)
+    }
+
+    const stepperNavigation = async (id) => {
+        if (stepperProgressCartData?.currentStepForUploadPres >= id) {
+            const updateStepperProgressPayload = {
+                currentStepForUploadPres: id
+            }
+            try {
+                const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, updateStepperProgressPayload);
+                console.log("userStepperAddResponse", userStepperAddResponse);
+                if (userStepperAddResponse.status) {
+                    const stepperResponse = await apiGET(`${API_URL}/v1/stepper-progress/user-stepper-progress/${userId}`)
+                    setStepperProgressCartData(stepperResponse.data?.data);
+                }
+            } catch (error) {
+                console.log("Error updating seleted prescription", error);
+            }
+        }
+        else {
+            toast.error("Please Select the Required details")
+        }
     }
 
     const getUserStepperProgress = async () => {
@@ -82,7 +105,7 @@ const UploadPrescription = () => {
             <h1 className='text-[#101010] font-bold text-lg'>Upload Prescription</h1>
             <div className='lg:flex  gap-4'>
                 <div className='lg:w-1/4 mt-4'>
-                    <PrescriptionStepper currentStep={stepperProgressCartData?.currentStepForUploadPres} steps={steps} />
+                    <PrescriptionStepper currentStep={stepperProgressCartData?.currentStepForUploadPres} steps={steps} stepperNavigation={stepperNavigation} />
                 </div>
                 <div className='w-full'>
                     {renderStepComponent(stepperProgressCartData?.currentStepForUploadPres)}

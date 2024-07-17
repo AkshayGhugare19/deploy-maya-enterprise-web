@@ -248,7 +248,7 @@ const Signup = () => {
         </form>
 
         <p className="mt-4 text-xs text-gray-600">
-          New on MAYA ENTERPRISE?{" "}
+          Already have an account?{" "}
           <Link to="/login" className="text-[#095D7E]">
             Login
           </Link>

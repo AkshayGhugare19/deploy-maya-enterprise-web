@@ -111,14 +111,16 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
                     ))}
                 </div>
 
-                <ButtonWithLoader loading={loading} buttonText={"Proceed to payment"} onClick={setOrderSummary} width={"w-[200px]"} />
+                <div className={`${stepperProgressCartData?.cartData?.length === 0 ? 'hidden' : 'lg:ml-auto'}`}>
+                    <ButtonWithLoader loading={loading} buttonText={"Proceed to payment"} onClick={setOrderSummary} width={"w-[200px]"} />
+                </div>
             </div>
-            <div className="flex flex-col lg:w-1/2">
+            <div className={`flex flex-col lg:w-1/2 ${stepperProgressCartData?.cartData?.length === 0 ? 'hidden' : ''}`}>
                 <PaymentSummary type="summary" item={stepperProgressCartData ? stepperProgressCartData : []} />
                 <AttachedPrescription type="cart" stepperProgressCartData={stepperProgressCartData} />
             </div>
         </div>
-    </div>
+    </div >
 }
 
 export default OrderSummaryStep;
