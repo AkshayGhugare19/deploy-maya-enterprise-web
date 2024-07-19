@@ -42,10 +42,22 @@ const BrandProducts = () => {
         }
     }
 
-    const getBrandData = async () => {
+    const getBrandData = async (sortIndex = '', page = 1) => {
         try {
-            const response = await apiGET(`v1/product/getProductsByBrandId/${id}`);
+            const payload = {
+                sortIndex,
+                limit: 10,
+                page,
+            };
+
+            const response = await apiPOST(`/v1/product/getProductsByBrandId/${id}`, payload);
             setProducts(response.data.data.product);
+            setPagination({
+                totalProducts: response?.data?.data?.pagination?.totalProducts,
+                totalPages: response?.data?.data?.pagination?.totalPages,
+                currentPage: response?.data?.data?.pagination?.currentPage,
+                pageSize: response?.data?.data?.pagination?.pageSize,
+            });
             console.log("Response:", response);
             console.log(products)
         } catch (error) {
@@ -60,58 +72,29 @@ const BrandProducts = () => {
     }, []);
 
 
-    const fetchProducts = async (sortIndex = '', page = 1) => {
-        setLoading(true);
-        try {
-            const payload = {
-                sortIndex,
-                limit: 10,
-                page,
-            };
-            const response = await apiPOST("/v1/product/getAllProducts", payload);
-            console.log(response)
-            if (response?.data?.status === true) {
-                // toast.success(response?.data?.data?.msg);
-                setProducts(response?.data?.data?.product);
-                setPagination({
-                    totalProducts: response?.data?.data?.pagination?.totalProducts,
-                    totalPages: response?.data?.data?.pagination?.totalPages,
-                    currentPage: response?.data?.data?.pagination?.currentPage,
-                    pageSize: response?.data?.data?.pagination?.pageSize,
-                });
-                setLoading(false);
-            } else {
-                toast.error(response?.data?.data?.msg);
-                setLoading(false);
-            }
-        } catch (error) {
-            toast.error('Failed to fetch products');
-            setLoading(false);
-        }
-    };
 
     useEffect(() => {
-        // fetchProducts(selectedLetter); // Fetch products for the default selected letter 'A' on mount
-    }, [selectedLetter]); // Empty dependency array ensures this runs only once
+        getBrandData(selectedLetter);
+    }, [selectedLetter]);
 
     const handleLetterClick = (letter) => {
         setSelectedLetter(letter);
-        // fetchProducts(letter, 1); // Fetch products for the selected letter and reset to page 1
+        getBrandData(letter, 1);
     };
 
     const handlePageChange = (page) => {
-        fetchProducts(selectedLetter, page); // Fetch products for the current selected letter and the specified page
+        getBrandData(selectedLetter, page);
     };
 
     useEffect(() => {
-        // fetchProducts(""); // Fetch products for the default selected letter 'A' on mount
-    }, []); // Empty dependency array ensures this runs only once
+        getBrandData("");
+    }, []);
 
 
     return (
         <div className="container mx-auto p-4">
             <SortByAlphabet onLetterClick={handleLetterClick} />
-            <h2>Showing {pagination?.pageSize * (pagination?.currentPage - 1) + 1}-{Math.min(pagination?.pageSize * pagination?.currentPage, pagination?.totalProducts)} of {pagination.totalProducts} results</h2>
+            <h2 className={`${pagination?.totalProducts === 0 ? 'hidden' : ''}`}>Showing {pagination?.pageSize * (pagination?.currentPage - 1) + 1}-{Math.min(pagination?.pageSize * pagination?.currentPage, pagination?.totalProducts)} of {pagination.totalProducts} results</h2>
 
 
             {/* {JSON.stringify(pagination)} */}

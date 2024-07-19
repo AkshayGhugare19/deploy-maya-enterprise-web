@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import Popup from "../Address/Popup";
 import { useNavigate } from "react-router-dom";
 import ButtonWithLoader from "../Button/ButtonWithLoader";
+import scrollToTop from "../../utilities/scrollToTop";
 
 const AddressDetails = ({ stepperProgressCartData }) => {
     const [duration, setDuration] = useState(5);
@@ -110,6 +111,10 @@ const AddressDetails = ({ stepperProgressCartData }) => {
         }
     }, [isOpen])
 
+    useEffect(() => {
+        scrollToTop()
+    }, [])
+
     return <div className="p-6 mt-4 bg-white shadow-lg rounded-lg mx-auto">
         <h2 className="text-lg font-semibold mb-4">Address Details</h2>
         <h2 className="text-md font-semibold mb-4">Select from saved address</h2>
@@ -132,9 +137,9 @@ const AddressDetails = ({ stepperProgressCartData }) => {
                 {/* <button onClick={setSelectedAddressFunc} className="mt-6 py-2 px-6 bg-[#14967F] text-white rounded-[30px] self-center lg:self-start">
                     Submit
                 </button> */}
-                <div className="lg:flex gap-4">
+                <div className="flex gap-2">
                     <ButtonWithLoader loading={loading} buttonText={"Submit"} onClick={setSelectedAddressFunc} width={"w-[100px]"} />
-                    <button onClick={() => setIsOpen(!isOpen)} className="mt-4 py-2 px-4 bg-[#F1F9FF] text-[#14967F] rounded-[30px]">
+                    <button onClick={() => setIsOpen(!isOpen)} className="mt-4 py-2 px-2 sm:px-4 bg-[#F1F9FF] text-[#14967F] text-sm sm:text-base rounded-[30px]">
                         + Add New Address
                     </button>
                 </div>

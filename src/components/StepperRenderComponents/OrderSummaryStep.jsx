@@ -12,7 +12,7 @@ import ButtonWithLoader from "../Button/ButtonWithLoader";
 import { toast } from "react-toastify";
 import { setCartCount } from "../../redux/users/users";
 
-const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData }) => {
+const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData, globalConfig }) => {
     const cartData = useSelector(state => state.cart?.cartData ? state.cart?.cartData : []);
     const userId = useSelector((state) => state.user?.userData?.id);
     const dispatch = useDispatch()
@@ -25,6 +25,7 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
                 const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
                 setStepperProgressCartData(stepperResponse.data?.data);
                 dispatch(setCartCount(stepperResponse.data?.data?.cartData?.length))
+                toast.success('Cart item removed successfully!')
             } else {
                 // return rejectWithValue(response.data);
             }
@@ -116,7 +117,7 @@ const OrderSummaryStep = ({ stepperProgressCartData, setStepperProgressCartData 
                 </div>
             </div>
             <div className={`flex flex-col lg:w-1/2 ${stepperProgressCartData?.cartData?.length === 0 ? 'hidden' : ''}`}>
-                <PaymentSummary type="summary" item={stepperProgressCartData ? stepperProgressCartData : []} />
+                <PaymentSummary type="summary" item={stepperProgressCartData ? stepperProgressCartData : []} globalConfig={globalConfig} />
                 <AttachedPrescription type="cart" stepperProgressCartData={stepperProgressCartData} />
             </div>
         </div>

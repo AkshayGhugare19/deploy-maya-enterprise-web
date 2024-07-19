@@ -72,17 +72,11 @@ const UploadPrescriptionStep = ({ type, setCurrentStep, stepperProgressCartData,
                 setLoading(false)
             }
         }
-        // if (type === 'cart' && selectedImageUrl.length) {
-        //     console.log("selectedImageUrl", selectedImageUrl);
-        //     dispatch(updateSelectedPrescription(selectedImageUrl))
-        // }
-        // else if (uploadedFileUrl) {
-        //     setCurrentStep();
-        // }
         else {
             console.log("Inside else", selectedImageUrl);
             const updateStepperProgressPayload = {
-                currentStep: 2
+                currentStep: 2,
+                selectedPrescription: selectedImageUrl
             }
             // dispatch(updateSelectedPrescription(selectedImageUrl))
             try {
@@ -141,7 +135,7 @@ const UploadPrescriptionStep = ({ type, setCurrentStep, stepperProgressCartData,
             <label className="block mb-2 text-lg font-bold text-gray-700">
                 Upload Prescription
             </label>
-            <div className="flex justify-between w-full">
+            <div className="md:flex justify-between w-full">
                 <div className="flex flex-col w-full">
                     <FileUploadInput setUploadedFileUrl={setUploadedFileUrl} />
                     {/* <UploadPrescriptionInput setUploadStatus={setUploadStatus} /> */}

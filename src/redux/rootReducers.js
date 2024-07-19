@@ -5,9 +5,9 @@ import successReducer from "./success/success";
 
 const rootReducers = {
 	user: userReducer,
-	cart: cartsReducer,
-	globalConfig: globalConfigReducer,
-	successInfo:successReducer
+	// cart: cartsReducer,
+	// globalConfig: globalConfigReducer,
+	successInfo: successReducer
 };
 
 export default rootReducers;

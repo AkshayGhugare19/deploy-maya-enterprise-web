@@ -105,7 +105,11 @@ function Login() {
           localStorage.setItem("accessToken", response?.data?.data?.tokens?.access?.token);
           localStorage.setItem("refreshToken", response?.data?.data?.tokens?.refresh?.token);
           navigate("/");
-        } else {
+        } else if (response.status === 401) {
+          toast.error(response?.data?.data?.msg || response?.data?.data || "Invalid credentials");
+        }
+        else {
+          console.log("else response", response);
           console.log("response?.data?.data", response?.data?.data);
           toast.error(response?.data?.data?.msg || response?.data?.data || "Invalid credentials");
           navigate("/VerifyOTP", { state: formData });
@@ -138,7 +142,7 @@ function Login() {
         <div className="flex justify-between">
           <h4 className='text-xl font-extrabold mb-2'>Log in</h4>
         </div>
-        <form onSubmit={handleSubmit} className="flex flex-col">
+        <form onSubmit={handleSubmit} className="flex flex-col mt-4">
           {Onclickphone ? (
             <label className="mb-4">
               <span className="block text-gray-700 mb-2">Enter phone number</span>
@@ -149,7 +153,7 @@ function Login() {
                   value={formData.phoneNo}
                   onChange={handleChange}
                   placeholder="Enter phone number"
-                  className="w-full p-2 rounded bg-[#F8F8F8] outline-none"
+                  className="w-full p-3 rounded-[8px] text-xs bg-[#F8F8F8] outline-none"
                 />
               </div>
               {errors.phoneNo && (
@@ -158,22 +162,22 @@ function Login() {
             </label>
           ) : (
             <label className="mb-4">
-              <span className="block text-gray-700 mb-2">Enter Email address</span>
+              <span className="block text-gray-700 text-sm mb-2">Enter Email address</span>
               <input
                 type="text"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter email address"
-                className="w-full p-2 rounded bg-[#F8F8F8] border outline-none"
+                className="w-full p-3 rounded-[8px] text-xs bg-[#F8F8F8] outline-none"
               />
               {errors.email && (
                 <span className="text-red-500 text-sm">{errors.email}</span>
               )}
             </label>
           )}
-          <label className="mb-4">
-            <span className="block text-gray-700 mb-2">Enter password</span>
+          <label className="mb-4 mt-3">
+            <span className="block text-gray-700 text-sm mb-2">Enter password</span>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -181,7 +185,7 @@ function Login() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Password"
-                className="w-full p-2 rounded bg-[#F8F8F8] border outline-none"
+                className="w-full p-3 rounded-[8px] text-xs bg-[#F8F8F8] outline-none"
               />
               <span
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 cursor-pointer"

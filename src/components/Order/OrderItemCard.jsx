@@ -6,44 +6,10 @@ import { apiDELETE, apiPOST } from "../../utilities/apiHelpers";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 
-const OrderItemCard = ({ item }) => {
+const OrderItemCard = ({ item, orderAgain, orderAgainLoading }) => {
     const navigate = useNavigate()
-    const isLoggedIn = useSelector((state) => state.user?.userData?.id) || false
     const [loading, setLoading] = useState(false)
-    const orderAgain = async (orderItem) => {
-        setLoading(true)
-        const response = await apiDELETE(`/v1/cart/remove-user-cart`);
-        if (response.status) {
-            if (orderItem?.productDetails?.productQuantity > orderItem?.quantity) {
-                try {
-                    let payload = {
-                        productId: orderItem?.productId,
-                        userId: isLoggedIn,
-                        quantity: orderItem?.quantity
-                    };
-                    const response = await apiPOST(`${API_URL}/v1/cart/add`, payload);
-                    if (response?.data?.status) {
-                        setLoading(false)
-                        toast.success(response?.data?.data?.data);
-                        navigate("/view-cart")
-                        return true;
-                    } else {
-                        setLoading(false)
-                        toast.error(response?.data?.data);
-                        return false;
-                    }
-                } catch (error) {
-                    setLoading(false)
-                    return false;
-                }
-            } else {
-                setLoading(false)
-                toast.info("Product quantity is not available")
-            }
-        } else {
-            toast.error("Please remove firt item from cart")
-        }
-    };
+
     return (
         item.orderItems?.map((orderItem) => (
             <div key={orderItem.productId} className="w-full flex flex-col lg:flex lg:flex-row bg-white rounded-lg shadow-lg p-2  space-x-10">
@@ -69,11 +35,11 @@ const OrderItemCard = ({ item }) => {
                         <div className="flex justify-between items-center space-x-2 w-full">
                             <span className="px-2 text-gray-500">Qty: {orderItem?.quantity}</span>
                             <button className="text-teal-600 items-center gap-1 flex "
-                                disabled={loading}
+                                disabled={orderAgainLoading}
                                 onClick={() => orderAgain(orderItem)}>
                                 Order again
                                 {
-                                    loading ?
+                                    orderAgainLoading ?
                                         <div className={`w-4 h-4 border-2 border-teal-600 border-solid rounded-full border-t-transparent animate-spin`}></div>
                                         : ""}
                             </button>

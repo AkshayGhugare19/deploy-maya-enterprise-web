@@ -3,6 +3,7 @@ import { apiPOST } from "../../utilities/apiHelpers";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Country, State, City } from 'country-state-city';
+import ButtonWithLoader from "../Button/ButtonWithLoader";
 export default function Popup({ isOpen, setIsOpen, onUpdate }) {
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
@@ -19,6 +20,7 @@ export default function Popup({ isOpen, setIsOpen, onUpdate }) {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const popupRef = useRef(null);
 
@@ -152,6 +154,7 @@ export default function Popup({ isOpen, setIsOpen, onUpdate }) {
       state: selectedState.name
     }
     try {
+      setLoading(true)
       const response = await apiPOST('/v1/address/add-address', addAddressPayload);
       if (response.status) {
         // Clear the form data
@@ -168,14 +171,17 @@ export default function Popup({ isOpen, setIsOpen, onUpdate }) {
         togglePopup();
         // onUpdate();
         toast.success('Address added successfully');
+        setLoading(false)
       } else {
         // Handle error
         console.error('Error adding address:', response.data.message);
         toast.error('Failed to add address');
+        setLoading(false)
       }
     } catch (error) {
       console.error('Error adding address:', error);
       toast.error('Failed to add address');
+      setLoading(false)
     }
   };
 
@@ -289,7 +295,8 @@ export default function Popup({ isOpen, setIsOpen, onUpdate }) {
                   {errors.city && <span className="text-xs text-red-500">{errors.city}</span>}
                 </div>
               </div>
-              <button type="submit" className='rounded-full bg-[#14967F] text-sm text-[#FFFFFF] p-3'>Save & Update</button>
+              {/* <button type="submit" className='rounded-full bg-[#14967F] text-sm text-[#FFFFFF] p-3'>Save & Update</button> */}
+              <ButtonWithLoader type={'submit'} loading={loading} buttonText={"Save & Update"} width={"w-[200px]"} />
             </form>
           </div>
         </div>

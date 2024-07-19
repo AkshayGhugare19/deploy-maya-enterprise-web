@@ -9,12 +9,8 @@ import { useNavigate } from "react-router-dom";
 import scrollToTop from "../../utilities/scrollToTop";
 import ButtonWithLoader from "../Button/ButtonWithLoader";
 
-const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) => {
-    const cartData = useSelector(state => state.cart?.cartData ? state.cart?.cartData : []);
-    const fullUserCartDetails = useSelector(state => state.cart ? state.cart : []);
+const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData, globalConfig }) => {
     const userId = useSelector((state) => state.user?.userData?.id);
-    const orderMode = useSelector((state) => state.cart?.orderMode) || '';
-    const enquiryId = useSelector((state) => state.cart?.enquiryId) || '';
     const [selectedOption, setSelectedOption] = useState('online');
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch()
@@ -202,7 +198,7 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                 {/* <button className="bg-[#14967F] font-[600] text-[#FFFFFF] w-[200px] rounded-[30px] p-2 self-end" onClick={addOrderAndItems}>Proceed to Payment</button> */}
             </div>
             <div className="flex flex-col lg:w-1/2">
-                <PaymentSummary type="summary" item={stepperProgressCartData ? stepperProgressCartData : []} />
+                <PaymentSummary type="summary" item={stepperProgressCartData ? stepperProgressCartData : []} globalConfig={globalConfig} />
                 <AttachedPrescription type="cart" stepperProgressCartData={stepperProgressCartData} />
             </div>
         </div>

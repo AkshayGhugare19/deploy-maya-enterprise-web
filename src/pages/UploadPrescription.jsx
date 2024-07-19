@@ -9,6 +9,7 @@ import { API_URL } from '../config';
 import { useSelector } from 'react-redux';
 import EnquiryUploadPrescription from '../components/PrescriptionStepperRenderComponents/EnquiryUploadPrescription';
 import { toast } from 'react-toastify';
+import { useLocation } from 'react-router-dom';
 
 const UploadPrescription = () => {
     const [currentStep, setCurrentStep] = useState(1);
@@ -19,7 +20,7 @@ const UploadPrescription = () => {
         { id: 2, name: 'Address Details' },
     ];
     const userId = useSelector((state) => state.user?.userData?.id) || ""
-
+    const location = useLocation();
     const handleCurrentStepUpdate = async (id) => {
         const updateStepperProgressPayload = {
             currentStepForUploadPres: id
@@ -68,25 +69,36 @@ const UploadPrescription = () => {
                     currentStepForUploadPres: 0
                 }
                 const userStepperAddResponse = await apiPOST(`${API_URL}/v1/stepper-progress/add-stepper-progress/${userId}`, stepperProgressAddPayload);
-                console.log("userStepperAddResponse", userStepperAddResponse);
                 setStepperProgressCartData(userStepperAddResponse.data?.data);
             } else {
                 const stepperProgressUpdatePayload = {
-                    orderMode: 'enquiry'
+                    orderMode: 'enquiry',
+                    currentStepForUploadPres: 0
                 }
-                const userStepperAddResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, stepperProgressUpdatePayload);
-                console.log('userStepperAddResponse', userStepperAddResponse);
-                setStepperProgressCartData(userStepperResponse.data?.data);
+                const userStepperPutResponse = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, stepperProgressUpdatePayload);
+                setStepperProgressCartData(userStepperPutResponse.data?.data);
             }
-            console.log("response", userStepperResponse);
         } catch (error) {
             console.error("Error fetching or creating stepper progress:", error);
         }
     }
 
+    // const resetCurrentStep = async () => {
+    //     const payload = {
+    //         currentStepForUploadPres: 0
+    //     }
+    //     const response = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, payload);
+    //     if (response.status) {
+    //         console.log('currentStepForUploadPres resetCurrentStep', response.data.data);
+    //         setStepperProgressCartData(response?.data?.data);
+    //     } else {
+    //         toast.error("Error Updating the user stepper");
+    //     }
+    // }
+
     useEffect(() => {
         getUserStepperProgress()
-    }, [])
+    }, [location])
 
     const renderStepComponent = (stepIndex) => {
         switch (stepIndex) {

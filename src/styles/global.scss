@@ -843,3 +843,6 @@ body {
 .carousel-item .card {
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+.transition-margin {
+    transition: margin-top 0s ease-in-out;
+}

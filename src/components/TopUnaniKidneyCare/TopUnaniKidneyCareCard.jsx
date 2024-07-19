@@ -42,7 +42,9 @@ const TopUnaniKidneyCareCard = ({ item, stepperProgressCartData, setStepperProgr
                 setIncrementLoader(false)
                 // return rejectWithValue(error.response.data);
             }
-        };
+        } else {
+            toast.error('Cannot select quantity greater than remaining product quantity')
+        }
     };
 
     const handleDecrement = async (productId) => {

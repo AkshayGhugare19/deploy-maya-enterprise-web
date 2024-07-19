@@ -20,7 +20,6 @@ const TopUnaniKidneyCareRated = ({ stepperProgressCartData, setStepperProgressCa
   const navigate = useNavigate()
   const sliderRefs = useRef({});
   const [data, setData] = useState([]);
-  const loggedInUserCartData = useSelector((state) => state.cart.cartData) || []
 
 
   const fetchData = async () => {

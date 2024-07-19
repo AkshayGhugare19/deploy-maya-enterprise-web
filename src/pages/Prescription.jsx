@@ -36,11 +36,10 @@ function Prescription() {
     try {
       await apiPUT(`v1/prescription/delete-prescription-img/${prescriptionId}`);
       setPrescriptions(prescriptions.filter(item => item._id !== prescriptionId));
-      alert(prescriptionId)
-      // toast.success('Prescription image deleted successfully!');
+       toast.success('Prescription deleted successfully');
     } catch (error) {
       console.error('error!', error);
-      toast.error('Failed to delete prescription image!');
+      toast.error('Failed to delete prescription image');
     }
   };
 
@@ -54,7 +53,6 @@ function Prescription() {
 
   return (
     <div className='container mx-auto p-4'>
-      <ToastContainer />
       <div className='mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'>
         {prescriptions?.map((item, index) => (
           <PrescriptionCard key={index} item={item} onDelete={handleDelete} />

@@ -12,13 +12,15 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import { apiGET, apiPOST, apiPUT } from "../utilities/apiHelpers";
 import { API_URL } from "../config";
 import scrollToTop from "../utilities/scrollToTop";
+import { useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ViewCart = () => {
     const dispatch = useDispatch();
-    const currentStep = useSelector((state) => state.cart?.currentStep);
-    const orderMode = useSelector((state) => state.cart?.orderMode) || '';
+    const location = useLocation();
     const userId = useSelector((state) => state.user?.userData.id) || '';
     const [stepperProgressCartData, setStepperProgressCartData] = useState([]);
+    const [globalConfig, setGlobalConfig] = useState([]);
     // const [currentStep, setCurrentStep] = useState(0);
     const steps = [
         'My Cart',
@@ -28,11 +30,11 @@ const ViewCart = () => {
         'Payment'
     ];
 
-    const goToNextStep = () => {
-        if (currentStep < steps.length - 1) {
-            updateStep(currentStep + 1);
-        }
-    };
+    // const goToNextStep = () => {
+    //     if (currentStep < steps.length - 1) {
+    //         updateStep(currentStep + 1);
+    //     }
+    // };
 
     const goToPrevStep = async () => {
         if (stepperProgressCartData?.currentStep > 0) {
@@ -49,15 +51,15 @@ const ViewCart = () => {
     const renderStepComponent = (stepIndex) => {
         switch (stepIndex) {
             case 0:
-                return <MyCartStep stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />;
+                return <MyCartStep stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} globalConfig={globalConfig} />;
             case 1:
-                return <UploadPrescriptionStep type="cart" stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />;
+                return <UploadPrescriptionStep type="cart" stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} globalConfig={globalConfig} />;
             case 2:
-                return <AddressStep stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />;
+                return <AddressStep stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} globalConfig={globalConfig} />;
             case 3:
-                return <OrderSummaryStep stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />;
+                return <OrderSummaryStep stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} globalConfig={globalConfig} />;
             case 4:
-                return <PaymentStep stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />;
+                return <PaymentStep stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} globalConfig={globalConfig} />;
             default:
                 return null;
         }
@@ -83,9 +85,37 @@ const ViewCart = () => {
         }
     }
 
+    const resetCurrentStep = async () => {
+        const payload = {
+            currentStep: 0
+        }
+        const response = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, payload);
+        if (response.status) {
+            console.log('resetCurrentStep', response.data.data);
+            setStepperProgressCartData(response?.data?.data);
+        } else {
+            toast.error("Error Updating the user stepper");
+        }
+    }
+
+    const fetchGlobalConfig = async () => {
+        try {
+            const response = await apiGET(`/v1/global-config/get-config`);
+            if (response.status) {
+                console.log(response?.data?.data?.data[0]);
+                setGlobalConfig(response?.data?.data?.data[0]);
+            } else {
+                // return rejectWithValue(response.data);
+                toast.error('Error fetching global config')
+            }
+        } catch (error) {
+            toast.error('Error', error)
+        }
+    }
     useEffect(() => {
         scrollToTop()
-        dispatch(fetchGlobalConfig())
+        // dispatch(fetchGlobalConfig())
+        fetchGlobalConfig()
         getUserStepperProgress();
         console.log(stepperProgressCartData?.currentStep);
         // return () => {
@@ -93,7 +123,11 @@ const ViewCart = () => {
         // };
     }, [])
 
-    return <div className="container mx-auto p-4">
+    useEffect(() => {
+        resetCurrentStep()
+    }, [location]);
+
+    return <div className="container mx-auto lg:p-4 p-2">
         <MyCartStepper steps={steps} currentStep={stepperProgressCartData?.currentStep} />
         {
             stepperProgressCartData?.currentStep > 0 && <button

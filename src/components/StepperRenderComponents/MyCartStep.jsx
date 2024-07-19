@@ -6,12 +6,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteCartItem, setCart, setOrderMode, updateCartItemQuantity } from "../../redux/carts/carts";
 import scrollToTop from "../../utilities/scrollToTop";
 import { setCartCount } from "../../redux/users/users";
+import { toast } from "react-toastify";
 
-const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData }) => {
+const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData, globalConfig }) => {
     // const [cartData, setCartData] = useState([]);
     const userId = useSelector((state) => state.user?.userData?.id);
     const dispatch = useDispatch()
-    const cartData = useSelector(state => state.cart?.cartData ? state.cart?.cartData : []);
+    // const cartData = useSelector(state => state.cart?.cartData ? state.cart?.cartData : []);
 
     const handleRemoveCartItem = async (id) => {
         // dispatch(deleteCartItem(id));
@@ -21,6 +22,7 @@ const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData }) => 
                 const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
                 setStepperProgressCartData(stepperResponse.data?.data);
                 dispatch(setCartCount(stepperResponse.data?.data?.cartData?.length))
+                toast.success('Cart item removed successfully!')
             } else {
                 // return rejectWithValue(response.data);
             }
@@ -111,7 +113,7 @@ const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData }) => 
                         />
                     ))}
                 </div>
-                <PaymentDetails item={stepperProgressCartData ? stepperProgressCartData : []} setStepperProgressCartData={setStepperProgressCartData} />
+                <PaymentDetails item={stepperProgressCartData ? stepperProgressCartData : []} setStepperProgressCartData={setStepperProgressCartData} globalConfig={globalConfig} />
             </div>
         </>
     );

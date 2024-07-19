@@ -8,7 +8,7 @@ import { API_URL } from '../../config';
 import { toast } from 'react-toastify';
 import Loader from '../Loader/Loader';
 import './ChildNavbar.css';  // Import custom CSS for animations
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 const ChildNavbar = () => {
@@ -21,7 +21,7 @@ const ChildNavbar = () => {
     const [locationLoading, setLocationLoading] = useState(false);
     const [globalSearchLoading, setGlobalSearchLoading] = useState(false);
     const { userData } = useSelector((state) => state.user);
-
+    const location = useLocation();
     const handleInputChange = (e) => {
         setGlobalSearchLoading(true);
         const value = e.target.value;
@@ -78,6 +78,11 @@ const ChildNavbar = () => {
     };
 
     useEffect(() => {
+        setSearchTerm('');
+        setShowDropdown(false);
+    }, [location]);
+
+    useEffect(() => {
         getAllProduct();
     }, []);
 
@@ -104,7 +109,7 @@ const ChildNavbar = () => {
                                 )
                             }
                         </div>
-                        <div className="flex w-full lg:w-[630px] items-center relative lg:ml-[-35px]">
+                        <div className="flex w-full lg:w-[630px] items-center relative lg:ml-[-35px] lg:my-0 my-3">
                             <input
                                 type="text"
                                 value={searchTerm}
@@ -120,7 +125,7 @@ const ChildNavbar = () => {
                                 )}
                             </div>
                             {showDropdown && (
-                                <div className="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-10 dropdown-animation">
+                                <div className="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-10 dropdown-animation max-h-[320px] overflow-y-auto scrollbar-custom scroll-smooth">
                                     {filteredResults.length > 0 ? (
                                         filteredResults.map((item, index) => (
                                             <div
@@ -140,7 +145,7 @@ const ChildNavbar = () => {
                             )}
                         </div>
                     </div>
-                    <button onClick={() =>userData? navigate('/upload-prescription'):toast.info("Please login to proceed")} className="bg-[#14967F] w-full lg:w-52 h-10 text-white text-center flex justify-center items-center space-x-2 px-3 py-2 rounded-full text-sm font-medium transition duration-300 transform hover:scale-105">
+                    <button onClick={() => userData ? navigate('/upload-prescription') : toast.info("Please login to proceed")} className="bg-[#14967F] w-full lg:w-52 h-10 text-white text-center flex justify-center items-center space-x-2 px-3 py-2 rounded-full text-sm font-medium transition duration-300 transform hover:scale-105">
                         <img src={uploadIcon} alt="Upload Icon" />
                         <div className='text-center' >Upload Prescription</div>
                     </button>

@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import SimpleLoader from '../Loader/SimpleLoader';
 import Loader from '../Loader/Loader';
 import CustomLoader from '../Loader/CustomLoader';
+import { toast } from 'react-toastify';
 
 const ProductCardofCart = ({ item, onQuantityChange, onDelete, stepperProgressCartData, setStepperProgressCartData }) => {
     const userId = useSelector((state) => state.user?.userData?.id);
@@ -46,6 +47,8 @@ const ProductCardofCart = ({ item, onQuantityChange, onDelete, stepperProgressCa
                 // return rejectWithValue(error.response.data);
                 setIncrementLoader(false)
             }
+        } else if (type === 'increment') {
+            toast.error('Cannot select quantity greater than remaining product quantity')
         }
 
         if (type === 'decrement' && quantity > 1) {
@@ -71,20 +74,20 @@ const ProductCardofCart = ({ item, onQuantityChange, onDelete, stepperProgressCa
     };
 
     return (
-        <div className="flex p-4 bg-white shadow-md rounded-lg mb-4">
+        <div className="sm:flex lg:p-4 p-2 bg-white shadow-md rounded-lg mb-4">
             {/* {JSON.stringify(item)} */}
             <img
-                className="w-24 h-24 object-cover object-center"
+                className="sm:w-24 sm:h-24 object-cover object-center"
                 src={`${item?.productDetails?.bannerImg}`}
                 alt="Ace Q10 Capsule"
             />
             <div className="ml-4 flex-grow">
-                <h3 className="text-lg font-semibold text-gray-800">{item?.productDetails?.name}</h3>
+                <h3 className="sm:text-lg text-md font-semibold text-gray-800">{item?.productDetails?.name}</h3>
                 <p className="text-sm text-gray-600">
-                    <span className="font-bold">Marketer: </span>{item?.productDetails?.marketer}
+                    <span className="font-bold sm:text-base text-sm">Marketer: </span>{item?.productDetails?.marketer}
                 </p>
                 <p className="text-sm text-gray-600">
-                    <span className="font-bold">Salt Composition: </span>
+                    <span className="font-bold sm:text-base text-sm">Salt Composition: </span>
                     {item?.productDetails?.saltComposition}
                 </p>
                 <div className="flex justify-between items-center mt-2">
@@ -112,20 +115,19 @@ const ProductCardofCart = ({ item, onQuantityChange, onDelete, stepperProgressCa
                     </div>
                 </div>
                 <div className='flex items-center'>
-
                     <div className="flex justify-between w-full items-center mt-4">
                         <div className='flex items-center'>
                             <div className="flex items-center">
-                                <span className="text-gray-500 line-through mr-2">₹{item?.productDetails?.price}</span>
-                                <span className="text-lg font-bold text-blue-600">₹{item?.productDetails?.discountedPrice}</span>
+                                <span className="sm:text-lg text-sm text-gray-500 line-through mr-2">₹{item?.productDetails?.price}</span>
+                                <span className="sm:text-lg text-sm font-bold text-blue-600">₹{item?.productDetails?.discountedPrice}</span>
                             </div>
-                            <div className='ml-4'>
+                            <div className='ml-4 flex items-center'>
                                 <button className="px-3 py-1 bg-gray-200 rounded-md" onClick={() => handleQuantityChange('decrement', item?._id, item?.quantity, item?.productDetails?.productQuantity)} disabled={incrementLoader}>{decrementLoader ? <CustomLoader width='w-5' height='h-5' /> : '-'}</button>
-                                <span className="px-3">{item?.quantity}</span>
+                                <span className="px-3 sm:text-lg text-sm">{item?.quantity}</span>
                                 <button className="px-3 py-1 bg-gray-200 rounded-md" onClick={() => handleQuantityChange('increment', item?._id, item?.quantity, item?.productDetails?.productQuantity)} disabled={incrementLoader}>{incrementLoader ? <CustomLoader width='w-5' height='h-5' /> : '+'} </button>
                             </div>
                         </div>
-                        <button className="p-2 text-red-500" onClick={handleDelete}>
+                        <button className="lg:p-2 mx-auto text-red-500" onClick={handleDelete}>
                             <svg
                                 className="w-5 h-5"
                                 fill="currentColor"

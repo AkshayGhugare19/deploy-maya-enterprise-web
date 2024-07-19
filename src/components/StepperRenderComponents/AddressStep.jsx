@@ -88,7 +88,7 @@ const AddressStep = ({ stepperProgressCartData, setStepperProgressCartData }) =>
                     ))}
                 </div>
                 <div className='flex gap-2'>
-                    <button onClick={() => setIsOpen(!isOpen)} className="mt-4 py-2 px-4 bg-[#F1F9FF] text-[#14967F] rounded-[30px]">
+                    <button onClick={() => setIsOpen(!isOpen)} className="mt-4 py-2 sm:px-4 px-2 bg-[#F1F9FF] text-[#14967F] text-sm sm:text-base rounded-[30px]">
                         + Add New Address
                     </button>
                     <ButtonWithLoader loading={loading} buttonText={"Submit"} onClick={setSelectedAddressFunc} width={"w-[100px]"} />

@@ -145,7 +145,6 @@ const VerifyOTP = () => {
 
   return (
     <div className="flex max-w-4xl md:mx-auto mt-10 border rounded-lg overflow-hidden shadow-lg mx-5">
-      {JSON.stringify(submitLoading)}
       <div
         style={{ backgroundColor: "#F1F9FF" }}
         className="hidden md:block lg:block flex-1 p-10 rounded-xl items-end"

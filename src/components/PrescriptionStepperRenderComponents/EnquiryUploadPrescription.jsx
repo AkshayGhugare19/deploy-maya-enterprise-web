@@ -21,7 +21,6 @@ const EnquiryUploadPrescription = ({ type, setCurrentStep, stepperProgressCartDa
     const [uploadStatus, setUploadStatus] = useState('');
     const [loading, setLoading] = useState(false);
     const userId = useSelector((state) => state.user?.userData?.id) || ""
-    const loggedInUserCartData = useSelector((state) => state.cart.cartData) || []
 
     const checkIsPriscriptionMandatory = () => {
         return stepperProgressCartData?.cartData.some((item) => item.productDetails?.isPrescription === true);
@@ -127,7 +126,7 @@ const EnquiryUploadPrescription = ({ type, setCurrentStep, stepperProgressCartDa
             <label className="block mb-2 text-lg font-bold text-gray-700">
                 Upload Prescription
             </label>
-            <div className="flex justify-between w-full">
+            <div className="md:flex justify-between w-full">
                 <div className="flex flex-col w-full">
                     <FileUploadInput setUploadedFileUrl={setUploadedFileUrl} />
                     {/* <UploadPrescriptionInput setUploadStatus={setUploadStatus} /> */}

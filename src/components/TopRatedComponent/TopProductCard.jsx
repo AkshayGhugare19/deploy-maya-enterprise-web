@@ -45,6 +45,8 @@ function TopProductCard({ item, stepperProgressCartData, setStepperProgressCartD
         // return rejectWithValue(error.response.data);
       }
       // dispatch(updateCartItemQuantity({ type: 'increment', id, quantity: currentQuantity }));
+    } else {
+      toast.error('Cannot select quantity greater than remaining product quantity')
     }
   };
 

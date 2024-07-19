@@ -74,19 +74,19 @@ const Products = () => {
     };
 
     const handlePageChange = (page) => {
-        fetchProducts(selectedLetter, page); // Fetch products for the current selected letter and the specified page
+        fetchProducts(selectedLetter, page);
     };
 
     useEffect(() => {
         fetchProducts("");
-        scrollToTop();// Fetch products for the default selected letter 'A' on mount
-    }, []); // Empty dependency array ensures this runs only once
+        scrollToTop();
+    }, []);
 
 
     return (
         <div className="container mx-auto p-4">
             <SortByAlphabet onLetterClick={handleLetterClick} />
-            <h2>Showing {pagination?.pageSize * (pagination?.currentPage - 1) + 1}-{Math.min(pagination?.pageSize * pagination?.currentPage, pagination?.totalProducts)} of {pagination.totalProducts} results</h2>
+            <h2 className={`${pagination?.totalProducts === 0 ? 'hidden' : ''}`}>Showing {pagination?.pageSize * (pagination?.currentPage - 1) + 1}-{Math.min(pagination?.pageSize * pagination?.currentPage, pagination?.totalProducts)} of {pagination.totalProducts} results</h2>
 
 
             {/* {JSON.stringify(pagination)} */}

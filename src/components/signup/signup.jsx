@@ -46,6 +46,10 @@ const Signup = () => {
       newErrors.name = "Full name is required";
       // toast.error(newErrors.name);
       isValid = false;
+    } else if (!/^[a-zA-Z .'-]+$/.test(formData.name)) {
+      newErrors.name = "Full name is invalid";
+      // toast.error(newErrors.email);
+      isValid = false;
     }
 
     if (!formData.email) {
@@ -198,6 +202,7 @@ const Signup = () => {
               onChange={handleChange}
               placeholder="Enter Email address"
               className="w-full p-3 rounded-[8px] text-xs bg-[#F8F8F8] outline-none"
+             autoComplete="off"
             />
             {errors.email && (
               <span className="text-red-500 text-sm">{errors.email}</span>
@@ -227,6 +232,7 @@ const Signup = () => {
                 onChange={handleChange}
                 placeholder="Enter Password"
                 className="w-full p-3 rounded-[8px] text-xs bg-[#F8F8F8] outline-none"
+                 autoComplete="off"
               />
               <span
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 cursor-pointer"

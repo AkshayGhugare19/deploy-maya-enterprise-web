@@ -12,7 +12,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.user);
-  const cartData = useSelector((state) => state.cart.cartData) || [];
   const cartCount = useSelector((state) => state.user.cartCount) || 0;
   const [isOpen, setIsOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(false);
@@ -184,7 +183,7 @@ const Navbar = () => {
             <button onClick={() => navigate('/')} className="text-gray-900 hover:text-teal-600 block px-3 py-2 rounded-md text-base font-medium">Home</button>
           </li>
           <li>
-            <button onClick={() => navigate('/kidney-medicines')} className="text-gray-900 hover:text-teal-600 block px-3 py-2 rounded-md text-base font-medium">Kidney Medicines</button>
+            <button onClick={() => navigate('/products')} className="text-gray-900 hover:text-teal-600 block px-3 py-2 rounded-md text-base font-medium">Kidney Medicines</button>
           </li>
           <li>
             <button onClick={() => navigate('/faqs')} className="text-gray-900 hover:text-teal-600 block px-3 py-2 rounded-md text-base font-medium">FAQs</button>

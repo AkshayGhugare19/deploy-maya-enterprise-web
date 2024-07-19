@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AttachedPrescription from "../presecription/AttachedPrescription";
 import { updateSelectedPrescriptionDuration, updateSelectedPrescriptionDurationUnit, updateSelectedPrescriptionType } from "../../redux/carts/carts";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,6 +6,7 @@ import { apiGET, apiPUT } from "../../utilities/apiHelpers";
 import { API_URL } from "../../config";
 import ButtonWithLoader from "../Button/ButtonWithLoader";
 import { toast } from "react-toastify";
+import scrollToTop from "../../utilities/scrollToTop";
 
 const ChooseMedicines = ({ setCurrentStep, stepperProgressCartData }) => {
     const [duration, setDuration] = useState(5);
@@ -82,6 +83,10 @@ const ChooseMedicines = ({ setCurrentStep, stepperProgressCartData }) => {
             setCurrentStep()
         }
     };
+
+    useEffect(() => {
+        scrollToTop()
+    }, [])
     return <>
         <div className="p-6 mt-4 bg-white shadow-lg rounded-lg mx-auto">
             <h2 className="text-lg font-semibold mb-4">Choose Your Medicines</h2>

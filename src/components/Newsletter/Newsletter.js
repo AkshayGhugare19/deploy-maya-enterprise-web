@@ -8,57 +8,59 @@ import { useSelector } from "react-redux";
 const Newsletter = () => {
   const userId = useSelector((state) => state.user?.userData?.id) || '';
   const [email, setEmail] = useState('')
-  const [subscription, setSubscription] = useState('')
+  // const [subscription, setSubscription] = useState('')
   const [loading, setLoading] = useState(false)
   const handleSubscription = async () => {
-    if (email) {
-      setLoading(true)
+    if (userId) {
+      if (validateEmail(email)) {
+        setLoading(true);
         try {
           const addPayload = {
-            "userId": userId,
-            "email": email,
-            "isEmailSubscribed": true
-          }
-          const response = await apiPOST(`${API_URL}/v1/email-subscribe/add`, addPayload)
-          console.log("rrr",response?.data?.data?.emailSubscribe)
+            userId: userId,
+            email: email,
+            isEmailSubscribed: true,
+          };
+          const response = await apiPOST(`${API_URL}/v1/email-subscribe/add`, addPayload);
           if (response?.data?.data?.emailSubscribe?.status) {
             toast.success(response?.data?.data?.emailSubscribe?.message);
-            setEmail('')
-            getSUbscriptions()
-            setLoading(false)
+            setEmail('');
           } else {
-            toast.error(response?.data?.data?.emailSubscribe?.message);
-            setEmail('')
-            getSUbscriptions()
-            setLoading(false)
+            toast.error(response?.data?.data?.emailSubscribe?.message || "Something went wrong");
           }
         } catch (error) {
+          toast.error("An error occurred. Please try again.");
           console.log(error);
-          setEmail('')
-          getSUbscriptions()
-          setLoading(false)
+        } finally {
+          setLoading(false);
         }
       } else {
-      toast.error("Please enter a valid email address");
+        toast.error("Please enter a valid email address");
       }
-  }
-
-  const getSUbscriptions = async () => {
-    try {
-      const response = await apiGET(`${API_URL}/v1/email-subscribe/get-by-user/${userId}`)
-      if (response?.data?.status) {
-        setSubscription(response?.data?.data?.data)
-      } else {
-        console.error("Failed to get subscribe");
-      }
-    } catch (error) {
-      console.log(error);
+    } else {
+      toast.error("User not logged in. Please login to subscribe to the newsletter.");
     }
-  }
+  };
 
-  useEffect(() => {
-    getSUbscriptions()
-  }, [userId])
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
+  // const getSUbscriptions = async () => {
+  //   try {
+  //     const response = await apiGET(`${API_URL}/v1/email-subscribe/get-by-user/${userId}`)
+  //     if (response?.data?.status) {
+  //       setSubscription(response?.data?.data?.data)
+  //     } else {
+  //       console.error("Failed to get subscribe");
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   getSUbscriptions()
+  // }, [userId])
 
   return (
     <div className="flex   justify-center items-center">

@@ -17,7 +17,6 @@ const KidneyMedicinesCard = ({ item, stepperProgressCartData, setStepperProgress
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const isLoggedIn = useSelector((state) => state.user?.userData?.id) || false
-  const loggedInUserCartData = useSelector((state) => state.cart.cartData) || []
   const [loading, setLoading] = useState(false)
   const [incrementLoader, setIncrementLoader] = useState(false)
   const [decrementLoader, setDecrementLoader] = useState(false)
@@ -46,7 +45,9 @@ const KidneyMedicinesCard = ({ item, stepperProgressCartData, setStepperProgress
         setIncrementLoader(false)
         // return rejectWithValue(error.response.data);
       }
-    };
+    } else {
+      toast.error('Cannot select quantity greater than remaining product quantity')
+    }
   };
 
   const handleDecrement = async (productId) => {

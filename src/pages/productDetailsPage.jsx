@@ -76,7 +76,7 @@ const ProductDeyailsPage = () => {
                     <li><span class="mx-2">{">"}</span></li>
                     <li><Link to='/products' class="text-[#817F7F] hover:underline">All Products</Link></li>
                     <li><span class="mx-2">{">"}</span></li>
-                    <li class="text-[#101010]">{productInformations?.productDetails?.name}</li>
+                    <li class="text-[#101010]">{productData?.name}</li>
                 </ol>
             </nav>
             <ProductDeyailsCard productInformations={productInformations} productData={productData} stepperProgressCartData={stepperProgressCartData} setStepperProgressCartData={setStepperProgressCartData} />

@@ -5,7 +5,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Cardbrand from './cardbrand';
-import { apiGET } from '../../utilities/apiHelpers';
+import { apiGET, apiPOST } from '../../utilities/apiHelpers';
 import { useNavigate } from 'react-router-dom';
 import SimpleLoader from '../Loader/SimpleLoader';
 
@@ -20,8 +20,13 @@ const Brand = () => {
     const fetchBrands = async () => {
       setLoading(true);
       try {
-        const response = await apiGET('v1/brand/all'); 
-        setBrands(response.data.data);
+        const payload = {
+          "page":1,
+          "limit": 10,
+          "searchQuery":""
+      }
+        const response = await apiPOST('v1/brand/all',payload);
+        setBrands(response?.data?.data?.brands);
         setLoading(false);
         console.log(response);
       } catch (error) {
@@ -37,14 +42,14 @@ const Brand = () => {
     dots: false,
     infinite: numItems > 1,
     speed: 500,
-    slidesToShow: Math.min(Math.max(numItems, 2), 4),
+    slidesToShow: Math.min(Math.max(numItems, 2), 6),
     slidesToScroll: 1,
     arrows: false,
     responsive: [
       {
         breakpoint: 2560,
         settings: {
-          slidesToShow: Math.min(Math.max(numItems, 2), 6),
+          slidesToShow: Math.min(Math.max(numItems, 2), 8),
           slidesToScroll: 1,
           dots: false,
         },
@@ -52,7 +57,7 @@ const Brand = () => {
       {
         breakpoint: 1424,
         settings: {
-          slidesToShow: Math.min(Math.max(numItems, 2),6 ),
+          slidesToShow: Math.min(Math.max(numItems, 2), 7),
           slidesToScroll: 1,
           dots: false,
         },
@@ -76,7 +81,7 @@ const Brand = () => {
       {
         breakpoint: 768,
         settings: {
-          slidesToShow: Math.min(Math.max(numItems, 2), 3),
+          slidesToShow: Math.min(Math.max(numItems, 2), 2),
           slidesToScroll: 1,
           dots: false,
         },
@@ -132,12 +137,12 @@ const Brand = () => {
                   alt="Next"
                   width="60px"
                 />
-                <Slider {...sliderSettings(brands.length)} ref={sliderRef} className='w-full abc'>
-                  {brands.map((brand) => (
-                    <div key={brand.id} className="px-4">
+                <Slider {...sliderSettings(brands?.length)} ref={sliderRef} className='w-full abc'>
+                  {brands?.length && brands.map((brand) => (
+                    <div key={brand?.id} className="px-4">
                       <Cardbrand
-                        onClick={() => navigate(`/product/brand/${brand.id}`)}
-                        item={{ src: brand.brandImgUrl }}
+                        onClick={() => navigate(`/product/brand/${brand?.id}`)}
+                        item={{ src: brand?.brandImgUrl }}
                       />
                     </div>
                   ))}

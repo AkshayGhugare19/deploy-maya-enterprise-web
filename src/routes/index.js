@@ -40,11 +40,13 @@ import AuthListener from "../utilities/authListener";
 import EnquiryOrderSummary from "../pages/EnquiryOrderSummary";
 import CodSuccessPage from "../pages/CodSuccessPage";
 import EmailSubscribeSuccess from "../pages/EmailSubscribeSuccess";
+import ChangePassword from "../components/profile/ChangePassword";
 
 
 export const publicPages = [
 	{ path: "/", exact: true, component: Home },
 	{ path: "/login", exact: true, component: Login },
+	{ path: "/change-password", exact: true, component: ChangePassword },
 	{ path: "/signup", exact: true, component: Signup },
 	{ path: "/createpassword", exact: true, component: CreatePassword },
 	{ path: "/VerifyOTP", exact: true, component: VerifyOTP },

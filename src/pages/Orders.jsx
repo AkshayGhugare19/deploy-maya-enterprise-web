@@ -1,29 +1,42 @@
 import React, { useEffect, useState } from "react";
 import OrderItemCard from "../components/Order/OrderItemCard";
-import { apiGET } from "../utilities/apiHelpers";
+import { apiDELETE, apiGET, apiPOST } from "../utilities/apiHelpers";
 import { API_URL } from "../config";
-import { useSelector } from "react-redux";
-import ReactPaginate from 'react-paginate';
+import { useDispatch, useSelector } from "react-redux";
 import { FiEye } from "react-icons/fi";
 import { MdKeyboardBackspace } from "react-icons/md";
 import moment from "moment";
 import scrollToTop from "../utilities/scrollToTop";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { setCartCount } from "../redux/users/users";
+import Pagination from "../components/Pagination/Pagination";
 
 const Orders = () => {
     const userId = useSelector((state) => state.user?.userData?.id) || '';
     const [orderData, setOrderData] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
-    const [currentPage, setCurrentPage] = useState(0);
     const [loading, setLoading] = useState(true);
-    const itemsPerPage = 10;
+    const [orderAgainLoading, setOrderAgainLoading] = useState(false);
+    const [page,setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(0)
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const getUserOrder = async () => {
         setLoading(true);
         try {
-            const response = await apiGET(`${API_URL}/v1/order/get-user-orders/${userId}`);
-            if (response.status) {
-                const sortedData = response?.data?.data?.sort((a, b) => new Date(b?.createdAt) - new Date(a?.createdAt));
-                setOrderData(sortedData);
+            const payload = {
+                "page":page,
+                "limit": 10,
+                "searchQuery":""
+            }
+            const response = await apiPOST(`${API_URL}/v1/order/get-user-orders/${userId}`,payload);
+            console.log("ppppp",response)
+            if (response?.data?.status) {
+                setOrderData(response?.data?.data?.orders);
+                setTotalPages(response?.data?.data?.totalPages)
             }
         } catch (error) {
             console.log("Error fetching user orders", error);
@@ -31,23 +44,58 @@ const Orders = () => {
         setLoading(false);
     };
 
+    const orderAgain = async (orderItem) => {
+        setOrderAgainLoading(true)
+        const response = await apiDELETE(`/v1/cart/remove-user-cart`);
+        if (response.status) {
+            if (orderItem?.productDetails?.productQuantity > orderItem?.quantity) {
+                try {
+                    let payload = {
+                        productId: orderItem?.productId,
+                        userId: userId,
+                        quantity: orderItem?.quantity
+                    };
+                    const response = await apiPOST(`${API_URL}/v1/cart/add`, payload);
+                    if (response?.data?.status) {
+                        const cartResponse = await apiGET(`${API_URL}/v1/cart/all-by-user/${userId}`)
+                        if (cartResponse.status) {
+                            setOrderAgainLoading(false)
+                            console.log("cartResponse.data?.data?.length", cartResponse.data?.data?.length);
+                            toast.success(response?.data?.data?.data);
+                            dispatch(setCartCount(cartResponse.data?.data?.length))
+                            navigate("/view-cart")
+                            return true;
+                        }
+                    } else {
+                        setOrderAgainLoading(false)
+                        toast.error(response?.data?.data);
+                        return false;
+                    }
+                } catch (error) {
+                    setOrderAgainLoading(false)
+                    return false;
+                }
+            } else {
+                setOrderAgainLoading(false)
+                toast.info("Product quantity is not available")
+            }
+        } else {
+            toast.error("Please remove firt item from cart")
+        }
+    };
+
+    
     useEffect(() => {
         getUserOrder();
-    }, [userId]);
+    }, [userId,page]);
     useEffect(() => {
         scrollToTop();
     })
-    const handlePageClick = ({ selected }) => {
-        setCurrentPage(selected);
-    };
 
-    const offset = currentPage * itemsPerPage;
-    const currentItems = orderData.slice(offset, offset + itemsPerPage);
 
     return (
         <div className="container mx-auto p-4">
             <div className="font-medium text-2xl">My Orders</div>
-
             {selectedOrder ? (
                 <div>
                     <button
@@ -57,7 +105,7 @@ const Orders = () => {
                         <MdKeyboardBackspace />
                     </button>
                     <div className="w-full grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2 xl:grid-cols-2 2xl:grid-cols-3 mt-4">
-                        <OrderItemCard item={selectedOrder} />
+                        <OrderItemCard item={selectedOrder} orderAgain={orderAgain} orderAgainLoading={orderAgainLoading} />
                     </div>
                 </div>
             ) : (
@@ -72,7 +120,7 @@ const Orders = () => {
                                     <th className="py-2 px-2 text-left bg-[#14967F] text-white border-b">Status</th>
                                     <th className="py-2 px-2 text-left bg-[#14967F] text-white border-b">Order Date</th>
                                     <th className="py-2 px-2 text-left bg-[#14967F] text-white border-b">Order Items</th>
-                                    <th className="py-2 px-2 bg-[#14967F] text-white border-b">View</th>
+                                    <th className="py-2 px-2 bg-[#14967F] text-white border-b">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -84,8 +132,8 @@ const Orders = () => {
                                             </div>
                                         </td>
                                     </tr>
-                                ) : currentItems.length ? (
-                                    currentItems.map((item) => (
+                                ) : orderData.length ? (
+                                    orderData.map((item) => (
                                         <tr key={item.id} className="hover:bg-[#ccecee]">
                                             <td className="py-2 px-2 border-b">{item?._id || "--"}</td>
                                             <td className="py-2 px-2 border-b">{item?.mode || "--"}</td>
@@ -99,8 +147,8 @@ const Orders = () => {
                                             </td>
                                             <td className="py-2 px-2 border-b">
                                                 <div className="flex justify-center items-center">
-                                                    <button onClick={() => setSelectedOrder(item)}>
-                                                        <FiEye />
+                                                    <button className="flex gap-2 items-center hover:underline" onClick={() => setSelectedOrder(item)}>
+                                                        <FiEye /> View
                                                     </button>
                                                 </div>
                                             </td>
@@ -109,27 +157,13 @@ const Orders = () => {
                                 ) : (
                                     <tr>
                                         <td colSpan="4" className="py-4 text-center">No Orders Found</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                    <ReactPaginate
-                        previousLabel={'Previous'}
-                        nextLabel={'Next'}
-                        breakLabel={'...'}
-                        pageCount={Math.ceil(orderData.length / itemsPerPage)}
-                        marginPagesDisplayed={2}
-                        pageRangeDisplayed={5}
-                        onPageChange={handlePageClick}
-                        containerClassName={'flex justify-center items-center mt-4 space-x-1'}
-                        pageClassName={'mx-1'}
-                        pageLinkClassName={'px-3 py-1 border rounded'}
-                        activeClassName={'text-blue-500 '}
-                        previousClassName={'px-3 py-1 border rounded'}
-                        nextClassName={'px-3 py-1 border rounded'}
-                        breakClassName={'px-3 py-1 border rounded'}
-                    />
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                                    <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+                        </div>
+                    
                 </>
             )}
         </div>

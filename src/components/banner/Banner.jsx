@@ -2,6 +2,7 @@
  import axios from 'axios';
  import Rectangle from '../../assest/image/Rectangle.svg';
 import { API_URL } from '../../config';
+import { apiGET } from '../../utilities/apiHelpers';
 const Banner = () => {
   const [bannerImages, setBannerImages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +12,7 @@ const Banner = () => {
          const fetchBannerImages = async () => {
            try {
             console.log('33')
-             const response = await axios.get(`${API_URL}/v1/bannerImg/get-all-banner-img`);
+             const response = await apiGET(`${API_URL}/v1/bannerImg/get-all-banner-img`);
              setBannerImages(response.data.data.data);
              console.log("dffgfgfdgs",response)
            } catch (err) {

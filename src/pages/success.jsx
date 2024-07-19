@@ -17,13 +17,13 @@ const PaymentSuccess = () => {
   const hasFetched = useRef(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
-  console.log("QData",data)
+  console.log("QData", data)
   const userId = useSelector((state) => state.user.userData.id) || ''
   const getSessionInfo = async (sessionId) => {
     try {
       setLoading(true);
       const response = await apiGET(`/v1/payment/get-session-info/${sessionId}`);
-      if (response.status === 200) {
+      if (response.status) {
         setData(response.data.data);
         console.log("session data", response?.data?.data);
         handlePaymentHistory(response?.data?.data)
@@ -46,7 +46,7 @@ const PaymentSuccess = () => {
         currentStep: 0
       }
       const response = await apiPUT(`/v1/stepper-progress/update-stepper-progress/${userId}`, payload);
-      if (response.status === 200) {
+      if (response.status) {
         try {
           const response = await apiDELETE(`/v1/cart/remove-user-cart`);
           if (response.status) {
@@ -69,26 +69,26 @@ const PaymentSuccess = () => {
     }
   }
 
-  const handlePaymentHistory = async(data)=>{
+  const handlePaymentHistory = async (data) => {
     console.log('Payment History???', data);
     try {
       const params = new URLSearchParams(location.search);
       const session_id = params.get('session_id');
-      console.log("History required",userId,session_id);
+      console.log("History required", userId, session_id);
       const paymentHistoryPayload = {
-          "userId": userId ,
-          "amount": 233,
-          "status": data?.status,
-          "currency": data?.currency,
-          "paymentId": data?.id,
-          "session_id":session_id,
-          "receipt_email": data?.receipt_email,
-          "payment_method_types": data?.payment_method_types[0]
+        "userId": userId,
+        "amount": 233,
+        "status": data?.status,
+        "currency": data?.currency,
+        "paymentId": data?.id,
+        "session_id": session_id,
+        "receipt_email": data?.receipt_email,
+        "payment_method_types": data?.payment_method_types[0]
       }
-      const historyResponse = await apiPOST(`${API_URL}/v1/payment-history/add`,paymentHistoryPayload)
-      if(historyResponse?.data?.status){
+      const historyResponse = await apiPOST(`${API_URL}/v1/payment-history/add`, paymentHistoryPayload)
+      if (historyResponse?.data?.status) {
         console.log("payment history add success")
-      }else{
+      } else {
         console.log("payment history add error")
       }
     } catch (error) {

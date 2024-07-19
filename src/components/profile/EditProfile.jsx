@@ -5,11 +5,14 @@ import { LuEyeOff } from "react-icons/lu";
 import { apiGET, apiPOST } from '../../utilities/apiHelpers';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ButtonWithLoader from '../Button/ButtonWithLoader';
+import { Link } from 'react-router-dom';
 
 function EditProfile() {
     const users = useSelector(state => state?.user.userData.id);
 
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [userDetails, setUserData] = useState({
         name: '',
         email: '',
@@ -48,15 +51,18 @@ function EditProfile() {
         e.preventDefault();
 
         try {
+            setLoading(true);
             const response = await apiPOST(`v1/users/update-user`, userDetails);
             console.log(response);
             console.log("Updated user details:", userDetails);
             if (response.status === 200) {
+                setLoading(false);
                 toast.success('Profile updated successfully');
             }
         } catch (error) {
             console.error('Error updating profile:', error);
             toast.error('Failed to update profile');
+            setLoading(false);
         }
     };
 
@@ -100,7 +106,7 @@ function EditProfile() {
                         />
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t-2 border-t-gray-200 space-x-4 px-4">
-                        <label className="block text-gray-700 text-xs">Password</label>
+                        <Link to={'/change-password'} className="block text-gray-700 text-xs">Change Password</Link>
                         <div className='flex items-center gap-4 mx-auto'>
                             {/* <input
                                 type={showPassword ? "text" : "password"}
@@ -116,9 +122,10 @@ function EditProfile() {
                             >
                                 {showPassword ? <IoEyeOutline /> : <LuEyeOff />}
                             </button> */}
-                            <button type="submit" className="text-xs text-[#14967F]">
+                            {/* <button type="submit" className="text-xs text-[#14967F]">
                                 Update
-                            </button>
+                            </button> */}
+                            <ButtonWithLoader loading={loading} type={'submit'} buttonText={"Update"} width={"w-[100px]"} />
                         </div>
                     </div>
                 </form>

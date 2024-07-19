@@ -5,12 +5,12 @@ import { apiGET, apiPUT } from "../../utilities/apiHelpers";
 import { API_URL } from "../../config";
 import ButtonWithLoader from "../Button/ButtonWithLoader";
 import { toast } from "react-toastify";
-const PaymentDetails = ({ item, setStepperProgressCartData }) => {
+const PaymentDetails = ({ item, setStepperProgressCartData, globalConfig }) => {
     const dispatch = useDispatch();
     const userId = useSelector((state) => state.user?.userData?.id);
-    const currentStep = useSelector((state) => state.cart.currentStep ? state.cart.currentStep : 0)
-    const selectedAddress = useSelector((state) => state.cart.selectedAddress ? state.cart.selectedAddress : '')
-    const globalConfig = useSelector((state) => state.globalConfig?.globalConfigData ? state.globalConfig?.globalConfigData : '')
+    // const currentStep = useSelector((state) => state.cart.currentStep ? state.cart.currentStep : 0)
+    // const selectedAddress = useSelector((state) => state.cart.selectedAddress ? state.cart.selectedAddress : '')
+    // const globalConfig = useSelector((state) => state.globalConfig?.globalConfigData ? state.globalConfig?.globalConfigData : '')
     const [loading, setLoading] = useState(false)
     const calculateCartAmount = (items) => {
         const totalPrice = items.reduce((sum, ele) => {
@@ -28,7 +28,7 @@ const PaymentDetails = ({ item, setStepperProgressCartData }) => {
     };
 
     const goToNextStep = async () => {
-        console.log(currentStep);
+        // console.log(currentStep);
         if (item?.currentStep == 0) {
             if (!isDataValid()) {
                 setLoading(true)
@@ -57,16 +57,16 @@ const PaymentDetails = ({ item, setStepperProgressCartData }) => {
     return <div className={`lg:w-1/2 h-full bg-white shadow-md rounded-lg p-6 ${item?.cartData?.length === 0 ? 'hidden' : ''}`}>
         <h3 className="text-lg font-semibold text-gray-800">Payment Details</h3>
         <p className="flex justify-between text-gray-600 mt-4">
-            <span>Cart Amount</span> <span>₹{item?.cartAmount}</span>
+            <span>Cart Amount</span> <span>{globalConfig?.currencyData?.symbol}{item?.cartAmount}</span>
         </p>
         <p className="flex justify-between text-gray-600 mt-2">
-            <span>Packaging Charges</span> <span>+ ₹{globalConfig?.packagingCharges}</span>
+            <span>Packaging Charges</span> <span>+ {globalConfig?.currencyData?.symbol}{globalConfig?.packagingCharges}</span>
         </p>
         <p className="flex justify-between text-gray-600 mt-2">
-            <span>Delivery Charges</span> <span>+ ₹{globalConfig?.deliveryCharges}</span>
+            <span>Delivery Charges</span> <span>+ {globalConfig?.currencyData?.symbol}{globalConfig?.deliveryCharges}</span>
         </p>
         <p className="flex justify-between text-[#14967F] mt-4 font-bold text-lg">
-            <span>Total to pay</span> <span>₹{item?.totalCartAmount}</span>
+            <span>Total to pay</span> <span>{globalConfig?.currencyData?.symbol}{item?.totalCartAmount}</span>
         </p>
         {/* <div className="mt-4 p-4 bg-gray-100 rounded-lg">
             <p className="text-gray-600">Delivering to</p>
