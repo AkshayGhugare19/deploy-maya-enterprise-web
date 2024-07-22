@@ -84,7 +84,7 @@ const Topratecomponet = () => {
       },
     ],
   });
-  
+
 
   const handleNextClick = (category) => {
     sliderRefs.current[category]?.slickNext();
@@ -134,7 +134,7 @@ const Topratecomponet = () => {
                     <label className='font-extrabold text-sm'>{product.name || " "}</label>
                   </div>
                   <div className='flex gap-2 mt-2'>
-                  {renderStars(item.avgRating)}
+                    {renderStars(item.avgRating)}
                   </div>
                   <div className='mt-4'>
                     <label className='line-through'>₹{product.price}</label>{' '}

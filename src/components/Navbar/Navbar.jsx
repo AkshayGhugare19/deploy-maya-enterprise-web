@@ -128,11 +128,17 @@ const Navbar = () => {
                         >
                           Saved Prescription
                         </button> */}
-                        <button
+                        {/* <button
                           onClick={() => navigate('/orders')}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
                           My Orders
+                        </button> */}
+                        <button
+                          onClick={() => navigate('/enquiries')}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          My Enquiries
                         </button>
                         <button
                           onClick={() => navigate('/prescriptions')}

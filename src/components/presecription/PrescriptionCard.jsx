@@ -2,8 +2,9 @@ import React from 'react';
 import calander from "../../assest/icons/calander.svg";
 import { MdRemoveRedEye } from 'react-icons/md';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import SimpleLoader from '../Loader/SimpleLoader';
 
-const PrescriptionCard = ({ item, onDelete }) => {
+const PrescriptionCard = ({ item, onDelete, isDeleting }) => {
   return (
     <div className="max-w-sm rounded-xl overflow-hidden shadow-lg border border-gray-200">
       <div className='relative'>
@@ -22,12 +23,16 @@ const PrescriptionCard = ({ item, onDelete }) => {
           Added on <span className="ml-auto text-green-600">{new Date(item.createdAt).toLocaleDateString()}</span>
         </span>
         <div className="flex justify-center gap-6 items-center w-full py-2">
-          <span
-            className="hover:bg-[#14967F] bg-[#CCECEE] flex gap-1 hover:text-white text-center items-center justify-center w-full font-bold p-2 cursor-pointer rounded-full"
-            onClick={() => onDelete(item._id)}
-          >
-            <RiDeleteBin6Line className='text-[20px] cursor-pointer' />Delete
-          </span>
+          {isDeleting ? (
+            <SimpleLoader /> // Show loader while deleting
+          ) : (
+            <span
+              className="hover:bg-[#14967F] bg-[#CCECEE] flex gap-1 hover:text-white text-center items-center justify-center w-full font-bold p-2 cursor-pointer rounded-full"
+              onClick={() => onDelete(item._id)}
+            >
+              <RiDeleteBin6Line className='text-[20px] cursor-pointer' />Delete
+            </span>
+          )}
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { API_URL } from "../config";
 import { toast } from "react-toastify";
 import EnquiryItemCard from "../components/Order/EnquiryItemCard";
 import Pagination from "../components/Pagination/Pagination";
+import scrollToTop from "../utilities/scrollToTop";
 
 const Enquiries = () => {
   const userId = useSelector((state) => state.user?.userData?.id) || '';
@@ -13,9 +14,9 @@ const Enquiries = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [totalPages, setTotalPages] = useState(1);
 
-//   const handleSearch = (e) => {
-//     setSearchQuery(e.target.value);
-//   };
+  //   const handleSearch = (e) => {
+  //     setSearchQuery(e.target.value);
+  //   };
 
   const getUserOrder = async () => {
     const payload = {
@@ -33,6 +34,7 @@ const Enquiries = () => {
   };
 
   useEffect(() => {
+    scrollToTop()
     getUserOrder();
   }, [page]);
 
@@ -62,9 +64,9 @@ const Enquiries = () => {
         )}
       </div>
       <div className="flex justify-center items-center bg-white mt-4">
-      <div className="w-full">
-      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-      </div>
+        <div className="w-full">
+          <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+        </div>
       </div>
     </div>
   );

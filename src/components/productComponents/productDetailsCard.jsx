@@ -38,8 +38,10 @@ const ProductDetailsCard = ({ productInformations, productData, stepperProgressC
     const [activeItem, setActiveItem] = useState('');
     const dispatch = useDispatch()
     const { id } = useParams()
+    console.log(id)
     const navigate = useNavigate()
     const isLoggedIn = useSelector((state) => state.user?.userData?.id) || false
+    // const loggedInUserCartData = useSelector((state) => state.cart.cartData) || []
     const [incrementLoader, setIncrementLoader] = useState(false)
     const [decrementLoader, setDecrementLoader] = useState(false)
     const [selectedImage, setSelectedImage] = useState('');
@@ -365,90 +367,82 @@ const ProductDetailsCard = ({ productInformations, productData, stepperProgressC
                             </div>
                         </div>
 
+            </div>
+        </div>
+        <div className='flex flex-col gap-4 mt-4'>
+            <div
+                id="introduction"
+                className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'introduction' ? 'mt-24' : ''}`}
+                onClick={() => scrollToSection('introduction')}
+            >
+                <div className='font-bold mb-2'>Introduction to {productData?.name}</div>
+                <div className='text-[14px] font-medium'>{productInformations?.introduction}</div>
+            </div>
+            <div
+                id="uses"
+                className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'uses' ? 'mt-24' : ''}`}
+            >
+                <div className='font-bold mb-2'>Uses of {productData?.name}</div>
+                <div className='text-[14px] font-medium'>{productInformations?.uses}</div>
+            </div>
+            <div
+                id="therapeutic-effects"
+                className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'therapeutic-effects' ? 'mt-24' : ''}`}
+            >
+                <div className='font-bold mb-2'>Therapeutic Effects of {productData?.name}</div>
+                <div className='text-[14px] font-medium'>{productInformations?.therapeuticEffects}</div>
+            </div>
+            <div
+                id="interaction"
+                className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'interaction' ? 'mt-24' : ''}`}
+            >
+                <div className='font-bold mb-2'>Interaction of {productData?.name}</div>
+                <div className='text-[14px] font-medium'>{productInformations?.interaction}</div>
+            </div>
+            <div
+                id="more-information-about"
+                className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'more-information-about' ? 'mt-24' : ''}`}
+            >
+                <div className='font-bold mb-2'>More Information About {productData?.name}</div>
+                <div className='text-[14px] font-medium'>{productInformations?.moreInformationabout}</div>
+            </div>
+            <div
+                id="how-to-consume"
+                className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'how-to-consume' ? 'mt-24' : ''}`}
+            >
+                <div className='font-bold mb-2'>How to consume {productData?.name}</div>
+                <div className='text-[14px] font-medium'>{productInformations?.howtoconsume}</div>
+            </div>
+            <div
+                id="safety-advice"
+                className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'safety-advice' ? 'mt-24' : ''}`}
+            >
+                <div className='font-bold mb-2'>Safety Advice for {productData?.name}</div>
+                {productInformations?.safetyAdvices && Object.keys(productInformations.safetyAdvices).map((key, index) => (
+                    <div key={index} className='flex mt-4 items-center'>
+                        <img src={grayCircleIcon} className='h-9 w-9' alt="Icon" />
+                        <div className='ml-4'>
+                            <div className='font-semibold text-xs'>{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                            <div className="text-xs">{productInformations.safetyAdvices[key]}</div>
+                        </div>
                     </div>
-                </div>
-                <div className='flex flex-col gap-4 mt-4'>
-                    <div
-                        id="introduction"
-                        className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'introduction' ? 'mt-24' : ''}`}
-                        onClick={() => scrollToSection('introduction')}
-                    >
-                        <div className='font-bold mb-2'>Introduction to {productData?.name}</div>
-                        <div className='text-[14px] font-medium'>{productInformations?.introduction}</div>
-                    </div>
-                    <div
-                        id="uses"
-                        className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'uses' ? 'mt-24' : ''}`}
-                        onClick={() => scrollToSection('uses')}
-                    >
-                        <div className='font-bold mb-2'>Uses of {productData?.name}</div>
-                        <div className='text-[14px] font-medium'>{productInformations?.uses}</div>
-                    </div>
-                    <div
-                        id="therapeutic-effects"
-                        className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'therapeutic-effects' ? 'mt-24' : ''}`}
-                        onClick={() => scrollToSection('therapeutic-effects')}
-                    >
-                        <div className='font-bold mb-2'>Therapeutic Effects of {productData?.name}</div>
-                        <div className='text-[14px] font-medium'>{productInformations?.therapeuticEffects}</div>
-                    </div>
-                    <div
-                        id="interaction"
-                        className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'interaction' ? 'mt-24' : ''}`}
-                        onClick={() => scrollToSection('interaction')}
-                    >
-                        <div className='font-bold mb-2'>Interaction of {productData?.name}</div>
-                        <div className='text-[14px] font-medium'>{productInformations?.interaction}</div>
-                    </div>
-                    <div
-                        id="more-information-about"
-                        className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'more-information-about' ? 'mt-24' : ''}`}
-                        onClick={() => scrollToSection('more-information-about')}
-                    >
-                        <div className='font-bold mb-2'>More Information About {productData?.name}</div>
-                        <div className='text-[14px] font-medium'>{productInformations?.moreInformationabout}</div>
-                    </div>
-                    <div
-                        id="how-to-consume"
-                        className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'how-to-consume' ? 'mt-24' : ''}`}
-                        onClick={() => scrollToSection('how-to-consume')}
-                    >
-                        <div className='font-bold mb-2'>How to consume {productData?.name}</div>
-                        <div className='text-[14px] font-medium'>{productInformations?.howtoconsume}</div>
-                    </div>
-                    <div
-                        id="safety-advice"
-                        className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'safety-advice' ? 'mt-24' : ''}`}
-                        onClick={() => scrollToSection('safety-advice')}
-                    >
-                        <div className='font-bold mb-2'>Safety Advice for {productData?.name}</div>
-                        {productInformations?.safetyAdvices && Object.keys(productInformations.safetyAdvices).map((key, index) => (
-                            <div key={index} className='flex mt-4 items-center'>
-                                <img src={grayCircleIcon} className='h-9 w-9' alt="Icon" />
-                                <div className='ml-4'>
-                                    <div className='font-semibold text-xs'>{key.replace(/([A-Z])/g, ' $1').trim()}</div>
-                                    <div className="text-xs">{productInformations.safetyAdvices[key]}</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div
-                        id="side-effects"
-                        className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'side-effects' ? 'mt-24' : ''}`}
-                        onClick={() => scrollToSection('side-effects')}
-                    >
-                        <div className='font-bold mb-2'>Side Effects of {productData?.name}</div>
-                        <div className='text-[14px] font-medium'>{productInformations?.sideEffects}</div>
-                    </div>
-                    <div
-                        id="word-of-advice"
-                        className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'word-of-advice' ? 'mt-24' : ''}`}
-                        onClick={() => scrollToSection('word-of-advice')}
-                    >
-                        <div className='font-bold mb-2'>Word of Advice</div>
-                        <div className='text-[14px] font-medium'>{productInformations?.wordofAdvice}</div>
-                    </div>
-                </div>
+                ))}
+            </div>
+            <div
+                id="side-effects"
+                className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'side-effects' ? 'mt-24' : ''}`}
+            >
+                <div className='font-bold mb-2'>Side Effects of {productData?.name}</div>
+                <div className='text-[14px] font-medium'>{productInformations?.sideEffects}</div>
+            </div>
+            <div
+                id="word-of-advice"
+                className={`bg-white shadow-md rounded-lg p-4 transition-margin ${activeSection === 'word-of-advice' ? 'mt-24' : ''}`}
+            >
+                <div className='font-bold mb-2'>Word of Advice</div>
+                <div className='text-[14px] font-medium'>{productInformations?.wordofAdvice}</div>
+            </div>
+        </div>
             </div>
         </div >
     );

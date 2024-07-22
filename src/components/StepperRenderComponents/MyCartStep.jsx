@@ -9,92 +9,6 @@ import { setCartCount } from "../../redux/users/users";
 import { toast } from "react-toastify";
 
 const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData, globalConfig }) => {
-    // const [cartData, setCartData] = useState([]);
-    const userId = useSelector((state) => state.user?.userData?.id);
-    const dispatch = useDispatch()
-    // const cartData = useSelector(state => state.cart?.cartData ? state.cart?.cartData : []);
-
-    const handleRemoveCartItem = async (id) => {
-        // dispatch(deleteCartItem(id));
-        try {
-            const response = await apiDELETE(`/v1/cart/delete/${id}`);
-            if (response.status) {
-                const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
-                setStepperProgressCartData(stepperResponse.data?.data);
-                dispatch(setCartCount(stepperResponse.data?.data?.cartData?.length))
-                toast.success('Cart item removed successfully!')
-            } else {
-                // return rejectWithValue(response.data);
-            }
-        } catch (error) {
-            // return rejectWithValue(error.response.data);
-        }
-    };
-
-    // const handleQuantityChange = async (type, id, quantity, productQuantity) => {
-    //     // Increment case: ensure quantity does not exceed productQuantity
-    //     if (type === 'increment' && quantity < productQuantity) {
-    //         const updatedQuantity = quantity + 1;
-    //         const payload = { quantity: updatedQuantity };
-    //         console.log(quantity, productQuantity, type, id);
-    //         try {
-    //             setIncrementLoader(true)
-    //             const response = await apiPUT(`/v1/cart/update/${id}`, payload);
-    //             if (response.status) {
-    //                 const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`);
-    //                 setStepperProgressCartData(stepperResponse.data?.data);
-    //                 setIncrementLoader(false)
-    //             } else {
-    //                 // return rejectWithValue(response.data);
-    //                 setIncrementLoader(false)
-    //             }
-    //         } catch (error) {
-    //             // return rejectWithValue(error.response.data);
-    //             setIncrementLoader(false)
-    //         }
-    //     }
-
-    //     if (type === 'decrement' && quantity > 1) {
-    //         const updatedQuantity = quantity - 1;
-    //         const payload = { quantity: updatedQuantity };
-    //         console.log(quantity, productQuantity, type, id);
-    //         try {
-    //             setDecrementLoader(true)
-    //             const response = await apiPUT(`/v1/cart/update/${id}`, payload);
-    //             if (response.status) {
-    //                 const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`);
-    //                 setStepperProgressCartData(stepperResponse.data?.data);
-    //                 setDecrementLoader(false)
-    //             } else {
-    //                 // return rejectWithValue(response.data);
-    //                 setDecrementLoader(false)
-    //             }
-    //         } catch (error) {
-    //             // return rejectWithValue(error.response.data);
-    //             setDecrementLoader(false)
-    //         }
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     const fetchCartData = async () => {
-    //         try {
-    //             if (userId) {
-    //                 const response = await apiGET(`/v1/cart/all-by-user/${userId}`);
-    //                 if (response.status) {
-    //                     console.log(response?.data?.data);
-    //                     dispatch(setCart(response?.data?.data));
-    //                 } else {
-    //                     console.error("Failed to fetch cart data", response);
-    //                 }
-    //             }
-    //         } catch (error) {
-    //             console.error("Error fetching cart data", error);
-    //         }
-    //     };
-    //     scrollToTop();
-    //     fetchCartData();
-    // }, []);
 
     return (
         <>
@@ -106,8 +20,6 @@ const MyCartStep = ({ stepperProgressCartData, setStepperProgressCartData, globa
                         <ProductCardofCart
                             key={item._id}
                             item={item}
-                            onDelete={() => handleRemoveCartItem(item._id)}
-                            // onQuantityChange={(type) => handleQuantityChange(type, item?._id, item?.quantity, item?.productDetails?.productQuantity)}
                             stepperProgressCartData={setStepperProgressCartData}
                             setStepperProgressCartData={setStepperProgressCartData}
                         />

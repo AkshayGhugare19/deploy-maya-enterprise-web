@@ -17,16 +17,33 @@ const PaymentSuccess = () => {
   const hasFetched = useRef(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
-  console.log("QData", data)
   const userId = useSelector((state) => state.user.userData.id) || ''
+
   const getSessionInfo = async (sessionId) => {
+
     try {
       setLoading(true);
       const response = await apiGET(`/v1/payment/get-session-info/${sessionId}`);
       if (response.status) {
-        setData(response.data.data);
+        setData(response?.data?.data?.paymentIntent);
+        if (response?.data?.data?.metadata?.orderId) {
+          fetchOrderToRemoveCart(response?.data?.data?.metadata?.orderId)
+          const updatePayload = {
+            mode: response?.data?.data?.metadata?.orderMode,
+            orderType: response?.data?.data?.metadata?.orderType,
+            status: 'paid'
+          }
+          try {
+            const orderUpdateResponse = await apiPUT(`${API_URL}/v1/order/update/${response?.data?.data?.metadata?.orderId}`, updatePayload)
+            if (orderUpdateResponse?.status) {
+              // toast.success('Order updated successfully')
+            }
+          } catch (error) {
+            toast.error('Failed to update order')
+          }
+        }
         console.log("session data", response?.data?.data);
-        handlePaymentHistory(response?.data?.data)
+        handlePaymentHistory(response?.data?.data?.paymentIntent)
       }
     } catch (error) {
       console.error('Error fetching session info: ', error);
@@ -35,6 +52,21 @@ const PaymentSuccess = () => {
       setLoading(false);
     }
   };
+
+  const fetchOrderToRemoveCart = async (id) => {
+    try {
+      const orderResponse = await apiGET(`${API_URL}/v1/order/${id}`)
+      console.log('fetchOrderToRemoveCart', orderResponse?.data);
+      if (orderResponse?.status) {
+        if (orderResponse?.data.data[0].mode !== 'enquiry' && orderResponse?.data.data[0].status !== 'paid') {
+          console.log("Inside orderResponse?.data.data[0].mode !== 'enquiry'");
+          deleteUserStepperProgress()
+        }
+      }
+    } catch (error) {
+      toast.error('Failed to fetch order')
+    }
+  }
 
   const deleteUserStepperProgress = async () => {
     try {
@@ -104,7 +136,6 @@ const PaymentSuccess = () => {
     const sessionId = params.get('session_id');
     if (sessionId) {
       getSessionInfo(sessionId);
-      deleteUserStepperProgress()
     }
   }, [location]);
 

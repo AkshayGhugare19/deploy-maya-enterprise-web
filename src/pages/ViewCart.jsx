@@ -21,7 +21,6 @@ const ViewCart = () => {
     const userId = useSelector((state) => state.user?.userData.id) || '';
     const [stepperProgressCartData, setStepperProgressCartData] = useState([]);
     const [globalConfig, setGlobalConfig] = useState([]);
-    // const [currentStep, setCurrentStep] = useState(0);
     const steps = [
         'My Cart',
         'Upload Prescription',
@@ -30,18 +29,12 @@ const ViewCart = () => {
         'Payment'
     ];
 
-    // const goToNextStep = () => {
-    //     if (currentStep < steps.length - 1) {
-    //         updateStep(currentStep + 1);
-    //     }
-    // };
 
     const goToPrevStep = async () => {
         if (stepperProgressCartData?.currentStep > 0) {
             const payload = {
                 currentStep: stepperProgressCartData?.currentStep - 1
             }
-            // dispatch(updateStep(currentStep - 1))
             const response = await apiPUT(`${API_URL}/v1/stepper-progress/update-stepper-progress/${userId}`, payload);
             console.log(response.data.data);
             setStepperProgressCartData(response?.data?.data);
@@ -105,7 +98,6 @@ const ViewCart = () => {
                 console.log(response?.data?.data?.data[0]);
                 setGlobalConfig(response?.data?.data?.data[0]);
             } else {
-                // return rejectWithValue(response.data);
                 toast.error('Error fetching global config')
             }
         } catch (error) {
@@ -114,13 +106,9 @@ const ViewCart = () => {
     }
     useEffect(() => {
         scrollToTop()
-        // dispatch(fetchGlobalConfig())
         fetchGlobalConfig()
         getUserStepperProgress();
         console.log(stepperProgressCartData?.currentStep);
-        // return () => {
-        //     dispatch(resetStateForEnquiry());
-        // };
     }, [])
 
     useEffect(() => {

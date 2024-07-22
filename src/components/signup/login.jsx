@@ -107,6 +107,8 @@ function Login() {
           navigate("/");
         } else if (response.status === 401) {
           toast.error(response?.data?.data?.msg || response?.data?.data || "Invalid credentials");
+        } else if (response.status === 404) {
+          toast.error(response?.data?.data?.msg || response?.data?.data || "Email Or Phone No Not Found");
         }
         else {
           console.log("else response", response);

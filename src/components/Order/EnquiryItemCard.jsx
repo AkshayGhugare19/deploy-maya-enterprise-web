@@ -99,13 +99,8 @@ const EnquiryItemCard = ({ item }) => {
             confirmButtonText: "Yes Proceed!",
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const response = await apiDELETE(`/v1/cart/remove-user-cart`);
-                if (response.status) {
-                    updateOrderSummary(orderId, userId);
-                    navigate(`/order-summary/${orderId}`);
-                } else {
-                    toast.error("Error Deleting Cart Items")
-                }
+                // updateOrderSummary(orderId, userId);
+                navigate(`/order-summary/${orderId}`);
             }
         });
     };

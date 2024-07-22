@@ -1,30 +1,36 @@
 // src/ProductCard.js
 import React, { useState } from 'react';
 import { apiDELETE, apiGET, apiPUT } from '../../utilities/apiHelpers';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import SimpleLoader from '../Loader/SimpleLoader';
 import Loader from '../Loader/Loader';
 import CustomLoader from '../Loader/CustomLoader';
 import { toast } from 'react-toastify';
+import { setCartCount } from '../../redux/users/users';
 
 const ProductCardofCart = ({ item, onQuantityChange, onDelete, stepperProgressCartData, setStepperProgressCartData }) => {
     const userId = useSelector((state) => state.user?.userData?.id);
     const [incrementLoader, setIncrementLoader] = useState(false)
     const [decrementLoader, setDecrementLoader] = useState(false)
-
-    const handleDelete = () => {
-        onDelete(item._id);
-    }
-
-    // const handleIncrement = () => {
-    //     onQuantityChange('increment', item?._id);
-    // }
-
-    // const handleDecrement = () => {
-    //     if (item.quantity > 1) {
-    //         onQuantityChange('decrement', item?._id);
-    //     }
-    // }
+    const [deleteItemLoader, setDeleteItemLoader] = useState(false)
+    const dispatch = useDispatch();
+    const handleRemoveCartItem = async (id) => {
+        try {
+            setDeleteItemLoader(true)
+            const response = await apiDELETE(`/v1/cart/delete/${id}`);
+            if (response.status) {
+                const stepperResponse = await apiGET(`/v1/stepper-progress/user-stepper-progress/${userId}`)
+                setStepperProgressCartData(stepperResponse.data?.data);
+                dispatch(setCartCount(stepperResponse.data?.data?.cartData?.length))
+                toast.success('Cart item removed successfully!')
+                setDeleteItemLoader(false)
+            } else {
+                setDeleteItemLoader(false)
+            }
+        } catch (error) {
+            setDeleteItemLoader(false)
+        }
+    };
 
     const handleQuantityChange = async (type, id, quantity, productQuantity) => {
         // Increment case: ensure quantity does not exceed productQuantity
@@ -40,11 +46,9 @@ const ProductCardofCart = ({ item, onQuantityChange, onDelete, stepperProgressCa
                     setStepperProgressCartData(stepperResponse.data?.data);
                     setIncrementLoader(false)
                 } else {
-                    // return rejectWithValue(response.data);
                     setIncrementLoader(false)
                 }
             } catch (error) {
-                // return rejectWithValue(error.response.data);
                 setIncrementLoader(false)
             }
         } else if (type === 'increment') {
@@ -63,11 +67,9 @@ const ProductCardofCart = ({ item, onQuantityChange, onDelete, stepperProgressCa
                     setStepperProgressCartData(stepperResponse.data?.data);
                     setDecrementLoader(false)
                 } else {
-                    // return rejectWithValue(response.data);
                     setDecrementLoader(false)
                 }
             } catch (error) {
-                // return rejectWithValue(error.response.data);
                 setDecrementLoader(false)
             }
         }
@@ -75,7 +77,6 @@ const ProductCardofCart = ({ item, onQuantityChange, onDelete, stepperProgressCa
 
     return (
         <div className="sm:flex lg:p-4 p-2 bg-white shadow-md rounded-lg mb-4">
-            {/* {JSON.stringify(item)} */}
             <img
                 className="sm:w-24 sm:h-24 object-cover object-center"
                 src={`${item?.productDetails?.bannerImg}`}
@@ -127,16 +128,18 @@ const ProductCardofCart = ({ item, onQuantityChange, onDelete, stepperProgressCa
                                 <button className="px-3 py-1 bg-gray-200 rounded-md" onClick={() => handleQuantityChange('increment', item?._id, item?.quantity, item?.productDetails?.productQuantity)} disabled={incrementLoader}>{incrementLoader ? <CustomLoader width='w-5' height='h-5' /> : '+'} </button>
                             </div>
                         </div>
-                        <button className="lg:p-2 mx-auto text-red-500" onClick={handleDelete}>
-                            <svg
-                                className="w-5 h-5"
-                                fill="currentColor"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                            >
-                                <path d="M3 6l3 18h12l3-18H3zm18-4h-5.58L15 0h-6l-.42 2H3v2h18V2z" />
-                            </svg>
-                        </button>
+                        {
+                            deleteItemLoader ? <CustomLoader width='w-5' height='h-5' /> : <button className="lg:p-2 mx-auto sm:mx-0 text-red-500" onClick={() => handleRemoveCartItem(item?._id)}>
+                                <svg
+                                    className="w-5 h-5"
+                                    fill="currentColor"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path d="M3 6l3 18h12l3-18H3zm18-4h-5.58L15 0h-6l-.42 2H3v2h18V2z" />
+                                </svg>
+                            </button>
+                        }
                     </div>
                 </div>
             </div>

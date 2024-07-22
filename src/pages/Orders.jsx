@@ -17,8 +17,7 @@ const Orders = () => {
     const [orderData, setOrderData] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [orderAgainLoading, setOrderAgainLoading] = useState(false);
-    const [page,setPage] = useState(1)
+    const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(0)
 
     const navigate = useNavigate();
@@ -28,12 +27,12 @@ const Orders = () => {
         setLoading(true);
         try {
             const payload = {
-                "page":page,
+                "page": page,
                 "limit": 10,
-                "searchQuery":""
+                "searchQuery": ""
             }
-            const response = await apiPOST(`${API_URL}/v1/order/get-user-orders/${userId}`,payload);
-            console.log("ppppp",response)
+            const response = await apiPOST(`${API_URL}/v1/order/get-user-orders/${userId}`, payload);
+            console.log("ppppp", response)
             if (response?.data?.status) {
                 setOrderData(response?.data?.data?.orders);
                 setTotalPages(response?.data?.data?.totalPages)
@@ -44,50 +43,12 @@ const Orders = () => {
         setLoading(false);
     };
 
-    const orderAgain = async (orderItem) => {
-        setOrderAgainLoading(true)
-        const response = await apiDELETE(`/v1/cart/remove-user-cart`);
-        if (response.status) {
-            if (orderItem?.productDetails?.productQuantity > orderItem?.quantity) {
-                try {
-                    let payload = {
-                        productId: orderItem?.productId,
-                        userId: userId,
-                        quantity: orderItem?.quantity
-                    };
-                    const response = await apiPOST(`${API_URL}/v1/cart/add`, payload);
-                    if (response?.data?.status) {
-                        const cartResponse = await apiGET(`${API_URL}/v1/cart/all-by-user/${userId}`)
-                        if (cartResponse.status) {
-                            setOrderAgainLoading(false)
-                            console.log("cartResponse.data?.data?.length", cartResponse.data?.data?.length);
-                            toast.success(response?.data?.data?.data);
-                            dispatch(setCartCount(cartResponse.data?.data?.length))
-                            navigate("/view-cart")
-                            return true;
-                        }
-                    } else {
-                        setOrderAgainLoading(false)
-                        toast.error(response?.data?.data);
-                        return false;
-                    }
-                } catch (error) {
-                    setOrderAgainLoading(false)
-                    return false;
-                }
-            } else {
-                setOrderAgainLoading(false)
-                toast.info("Product quantity is not available")
-            }
-        } else {
-            toast.error("Please remove firt item from cart")
-        }
-    };
 
-    
+
+
     useEffect(() => {
         getUserOrder();
-    }, [userId,page]);
+    }, [userId, page]);
     useEffect(() => {
         scrollToTop();
     })
@@ -105,7 +66,9 @@ const Orders = () => {
                         <MdKeyboardBackspace />
                     </button>
                     <div className="w-full grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2 xl:grid-cols-2 2xl:grid-cols-3 mt-4">
-                        <OrderItemCard item={selectedOrder} orderAgain={orderAgain} orderAgainLoading={orderAgainLoading} />
+                        {selectedOrder?.orderItems?.map((orderItem) => (
+                            <OrderItemCard orderItem={orderItem} />
+                        ))}
                     </div>
                 </div>
             ) : (
@@ -157,13 +120,13 @@ const Orders = () => {
                                 ) : (
                                     <tr>
                                         <td colSpan="4" className="py-4 text-center">No Orders Found</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                                    <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-                        </div>
-                    
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                        <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+                    </div>
+
                 </>
             )}
         </div>

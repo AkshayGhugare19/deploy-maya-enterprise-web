@@ -34,6 +34,7 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData, glob
                 const addCodOrderResponse = await apiPOST(`/v1/order/add`, addCodOrderPayload);
                 if (addCodOrderResponse) {
                     if (addCodOrderResponse?.data?.data && stepperProgressCartData?.cartData?.length) {
+                        toast.success('Order Placed successfully')
                         stepperProgressCartData?.cartData && stepperProgressCartData?.cartData?.length !== 0 && stepperProgressCartData?.cartData?.map(async (item) => {
                             console.log(addCodOrderResponse?.data);
                             const addOrderItemPayload = {
@@ -44,7 +45,6 @@ const PaymentStep = ({ stepperProgressCartData, setStepperProgressCartData, glob
                             try {
                                 const orderItemResponse = await apiPOST(`/v1/order-item/add`, addOrderItemPayload);
                                 if (orderItemResponse) {
-                                    toast.success('Order Placed successfully')
                                     setLoading(false);
                                     navigate(`/cod-success-page/${addCodOrderResponse?.data?.data?.id}`)
                                 }
